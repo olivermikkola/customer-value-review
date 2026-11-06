@@ -42,11 +42,18 @@ emme dioihin."
 kolmeen havaintoon — ei neljäänkymmeneen sivuun. Järjestelmä on jo rankannut ne:
 materiaalisuus × uutuus × tehtävyys."
 
-*(näkyy: 3 korttia. Kortti 1 = vesi, kortti 2 = hävikki, kortti 3 = korjaussuhde)*
+*(näkyy: 3 korttia. Oletusjärjestys: katoaminen, vesi, korjaussuhde — eniten rahaa
+liikuttava ensin)*
+
+**A:** "Kolme havaintoa, ei neljääkymmentä sivua. Järjestelmä on jo rankannut ne:
+materiaalisuus × uutuus × tehtävyys. Talouslinssillä kärjessä on katoaminen. Mutta
+vaihdetaan vastuullisuuslinssiin — sama data, sama totuus, eri järjestys."
+
+*(klikkaa linssiä. Kortit järjestyvät uudelleen: vesi nousee ensimmäiseksi)*
 
 ### 1:20–2:20 — Havainto 1: kolme syvyyttä
 
-**A:** "Ensimmäinen: veden ominaiskulutus nousi 13,9 prosenttia."
+**A:** "Ensimmäinen: veden ominaiskulutus nousi 14,0 prosenttia."
 
 *(klikkaa korttia → taso 2: kaava ja luvut)*
 "Neljä tuhatta kaksisataakymmenen kuutiota jaettuna 38 400 kilolla pyykkiä.

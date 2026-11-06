@@ -1,0 +1,23 @@
+{
+  "name": "lanka",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LANKA — elävä asiakaskatsaus. Todisteketju operatiivisista tapahtumista asiakkaalle näkyviin väitteisiin.",
+  "scripts": {
+    "seed": "node src/cli.ts seed",
+    "facts": "node src/cli.ts facts",
+    "review": "node src/cli.ts review",
+    "verify": "node src/cli.ts verify",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run verify"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

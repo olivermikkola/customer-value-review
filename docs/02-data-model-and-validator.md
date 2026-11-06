@@ -72,8 +72,9 @@ type Measure = {
   value: number;
   unit: string;
   formula: string;               // "water_m3 / linen_kg"
-  inputs: string[];              // ["src:...:water:2025-Q3", "src:...:linen:2025-Q3"]
-  factors: string[];             // ["fac:water-per-kg-linen@v3"]
+  bindings: Record<string, string>; // { water_m3: "mea:...", linen_kg: "mea:..." }
+  inputs: string[];              // bindingsin arvot jotka eivät ole kertoimia
+  factors: string[];             // ["fac:water-per-kg-linen@v3"] — aina versioitu
   confidence: "measured" | "estimated" | "proxy";  // = min(inputs)
 };
 ```
@@ -81,20 +82,35 @@ type Measure = {
 Luottamus periytyy: `min(inputtien luottamus)`. Mittaridata + punnitustositteet →
 `measured`. Toimialaproxysta johdettu vertailuluku → `proxy`, ja UI näyttää sen.
 
+**`formula` on dataa, ei koodia.** Se evaluoidaan pienellä laskimella joka tukee
+vain `+ - * / ( )` ja nimettyjä muuttujia — ei `eval`:ia, ei kirjastoja. Siksi
+`npm run verify` voi laskea jokaisen luvun uudelleen eikä kenenkään tarvitse
+luottaa siihen joka luvun laski.
+
 ### Claim — väite
 
 ```ts
 type Claim = {
-  id: string;                    // "clm:water-intensity-up-q3"
+  id: string;                    // "clm:water-intensity-up"
   kind: "change" | "level" | "comparison" | "avoided_impact" | "benchmark";
+  label: string;                 // havainnon otsikko
   subject: { metricId: string; scope: Scope };
   measureIds: string[];          // mitä laskelmia väite käyttää
+  /** Miten stated.value johdetaan. Deterministinen, ei LLM:n asia. */
+  derivation:
+    | { kind: "level"; measureId: string }
+    | { kind: "change"; fromMeasureId: string; toMeasureId: string }
+    | { kind: "delta"; fromMeasureId: string; toMeasureId: string }   // esim. pp
+    | { kind: "comparison"; measureId: string; benchmarkMeasureId: string };
   stated: { value: number; unit: string; direction: "up" | "down" | "flat" };
   benchmarkMeasureId?: string;   // pakollinen kind === "comparison" | "benchmark"
   confidence: "measured" | "estimated" | "proxy";
   materiality: number;           // 0..1 — paljonko tämä liikuttaa rahaa/CO2:ta
 };
 ```
+
+`derivation` on koko validaattorin perusta: se kertoo miten `stated.value`
+**pitää** laskea. V4 vertaa mallin esittämää lukua tähän, ei mihinkään muuhun.
 
 ### Driver — syy-yhteysreuna (erillinen!)
 
@@ -103,14 +119,16 @@ type Driver = {
   id: string;
   claimId: string;               // mitä väitettä selittää
   causeRef: string;              // "event:mat-frequency-increase@site-A,site-B"
-  attributedShare: number;       // 0..1 — paljonko selittää
+  attributedShare: number | null; // 0..1 — paljonko selittää; null = ei tiedetä
+  attributedAmount: number | null;
   method: "measured" | "modeled" | "hypothesis";
   evidenceClaimIds: string[];
 };
 ```
 
 `attributedShare` on se luku joka tekee demosta uskottavan. Sen pitää saada olla
-**alle 1.0**. Jos järjestelmä pakotetaan selittämään 100 %, se valehtelee.
+**alle 1.0** — ja sen pitää saada olla **`null`**. Jos järjestelmä pakotetaan
+selittämään 100 %, se valehtelee.
 
 ### Observation → Recommendation → Commitment
 
@@ -159,7 +177,7 @@ mea:water-intensity:2025-Q3 = 4210 / 38400 = 0.10964 m3/kg   measured
 mea:water-intensity:2024-Q3 = 3472 / 36100 = 0.09618 m3/kg   measured
 
 clm:water-intensity-up-q3
-  stated: +13.9 %   (0.10964/0.09618 - 1 = +0.1399)
+  stated: +14.0 %   (0.10964/0.09618 - 1 = +0.1399)
   confidence: measured
 ```
 
@@ -178,7 +196,7 @@ Loput 344 m3: ajoittuu Espoon pesulan vajaiden kuormien jaksoon 2025-08.
 
 Väite jonka UI näyttää:
 
-> Veden ominaiskulutus nousi **13,9 %** (0,096 → 0,110 m³/kg).
+> Veden ominaiskulutus nousi **14,0 %** (0,096 → 0,110 m³/kg).
 > Mattotiheyden nosto kahdella toimipisteellä selittää noin **53 %** noususta.
 > Loppuosa ajoittuu Espoon pesulan vajaiden kuormien jaksoon — syytä ei ole vahvistettu.
 
@@ -210,82 +228,42 @@ green claims -vaatimuksiin, eli myyntikulma eikä vain insinöörin hienous.
 
 ### Referenssitoteutus
 
+Toteutus on repossa: [`src/validator.ts`](../src/validator.ts). Ydinajatus on
+**slotti**: malli ei koskaan kirjoita numeroa, se kirjoittaa paikan.
+
+```ts
+// Malli saa tuottaa vain tällaista:
+"Veden ominaiskulutus nousi [[clm:water-intensity-up]] vuoden takaiseen verrattuna."
+//                                            ^^ renderöijä täyttää tämän
+
+// [[clm:x]]        -> väitteen arvo, muotoiltuna väitteen omasta yksiköstä
+// [[clm:x:0]]      -> sama, 0 desimaalia
+// {{drv:mat-frequency}} -> driven label, eli dataa (ei mallin proosaa)
+```
+
+Kun numero on aina slot, V1 lakkaa olemasta mielipide ja muuttuu mekaaniseksi
+tarkistukseksi: poista slotit tekstistä, ja jos jäljelle jää yksi ainoa numero,
+hylkäys. Sama temppu tekee V9:stä (pyöristys) tarkistettavan.
+
+Ulos tulee hyväksytyt lauseet ja hylkäykset **syykoodeineen**:
+
 ```ts
 type Verdict =
   | { ok: true }
-  | { ok: false; code: string; sentence: string; detail: string };
-
-const CAUSAL_RE = /\b(koska|johtuu|aiheutti|selittää|sen vuoksi|tästä syystä)\b/i;
-const SUPERLATIVE_RE = /\b(paras|parhain|merkittävästi|selvästi parempi|huippu)\b/i;
-const NUM_RE = /\d+([.,]\d+)?/g;
-
-export function validateSentence(
-  sentence: string,
-  claims: Map<string, Claim>,
-  measures: Map<string, Measure>,
-  drivers: Driver[],
-  epsilon = 1e-3,
-): Verdict {
-  // V1 — jokainen luku kuuluu johonkin väitteeseen
-  const nums = sentence.match(NUM_RE) ?? [];
-  const bound = claimsIn(sentence, claims); // lause kantaa claim-ID:t sivukanavassa
-  if (nums.length > 0 && bound.length === 0) {
-    return { ok: false, code: "UNSOURCED_NUMBER", sentence,
-             detail: `${nums.length} lukua ilman claim-ID:tä` };
-  }
-
-  for (const claim of bound) {
-    // V2 — ketju ehjä
-    if (claim.measureIds.length === 0) {
-      return { ok: false, code: "BROKEN_CHAIN", sentence, detail: claim.id };
-    }
-    for (const mid of claim.measureIds) {
-      const m = measures.get(mid);
-      if (!m || (m.inputs.length === 0 && m.factors.length === 0)) {
-        return { ok: false, code: "BROKEN_CHAIN", sentence, detail: mid };
-      }
-    }
-
-    // V4 — laske uudelleen, älä luota malliin
-    const recomputed = recompute(claim, measures);
-    if (Math.abs(recomputed - claim.stated.value) > epsilon) {
-      return { ok: false, code: "RECOMPUTE_MISMATCH", sentence,
-               detail: `väitetty ${claim.stated.value}, laskettu ${recomputed}` };
-    }
-
-    // V6 — luottamus ei saa yliarvioida
-    const floor = minConfidence(claim, measures);
-    if (rank(claim.confidence) > rank(floor)) {
-      return { ok: false, code: "CONFIDENCE_INFLATED", sentence,
-               detail: `${claim.confidence} > ${floor}` };
-    }
-
-    // V7 — kausaliteetti vaatii reunan
-    if (CAUSAL_RE.test(sentence) &&
-        !drivers.some(d => d.claimId === claim.id)) {
-      return { ok: false, code: "UNSUPPORTED_CAUSAL", sentence,
-               detail: `väitteellä ${claim.id} ei ole Driver-reunaa` };
-    }
-
-    // V8 — superlatiivi vaatii vertailun
-    if (SUPERLATIVE_RE.test(sentence) && !claim.benchmarkMeasureId) {
-      return { ok: false, code: "UNSUPPORTED_SUPERLATIVE", sentence,
-               detail: claim.id };
-    }
-  }
-
-  return { ok: true };
-}
+  | { ok: false; code: Code; sentence: string; detail: string };
 ```
 
 Kaksi toteutusyksityiskohtaa joilla tämä pysyy rehellisenä:
 
-1. **Claim-ID kulkee sivukanavassa, ei tekstissä.** Malli palauttaa rakenteen
-   `{ text, claimIds }` per lause, ei pelkkää proosaa. Muuten sidonta on
-   jälkikäteen arvaamista.
+1. **Numerot eivät ole mallin tekstiä.** Malli valitsee väitteet ja järjestyksen —
+   se ei tiedä yhtään lukua eikä voi keksiä sellaista. Siksi "hallusinoitu luku"
+   ei ole riski jota hallitaan, vaan tila jota ei ole olemassa.
 2. **`recompute` ajetaan oikeasti.** Jos väite ei täsmää laskettuun arvoon,
    hylkäys — ei "korjata hiljaa". Hiljainen korjaus on sama kuin valehtelu
    kauniimmalla fontilla.
+
+Testi `tests/validator.test.ts` todistaa tämän: se vaihtaa yhden väitteen arvon
+13,99 % → 14,00 % ja validaattori hylkää lauseen `RECOMPUTE_MISMATCH`:lla.
 
 ### Hylkäys näytetään, ei piiloteta
 

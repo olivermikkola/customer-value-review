@@ -34,8 +34,45 @@ perusteettomat kausaliteetit ja ylisanat ilman vertailudataa.
 | Decision support | Jokainen havainto → ehdotus + vaikutusarvio + trade-off |
 | Interfaces | Katsaus on jaettu tila, ei PDF |
 
-## Tila
+## Mitä on rakennettu
 
-Konsepti ja spesifikaatio valmiina. Seuraava askel: seed-datasetti ja
-provenienssikerros (`Source` → `Measure` → `Claim` → `recompute`), jonka päälle
-narratiivi ja UI.
+Ydin on pystyssä: deterministinen seed-datasetti, `Source → Measure → recompute`
+-ketju, väitteet, syy-reunat, validaattori ja katsauksen ranking. Ei UI:ta vielä.
+
+```bash
+npm install
+npm run check      # typecheck + 27 testiä + verify
+npm run seed       # kirjoittaa seed/customer.json (162 lähdettä, 6 toimipistettä)
+npm run facts      # kirjoittaa docs/facts.md — ainoa paikka josta lukuja lainataan
+npm run review     # kolme havaintoa + todisteketju + hyväksytty/hylätty narratiivi
+npm run review sustainability   # sama data, vastuullisuuslinssi
+```
+
+```
+src/
+  model.ts       tyypit: Source, Factor, Measure, Claim, Driver, Observation
+  expr.ts        turvallinen laskin (+ - * / sulut), ei eval:ia
+  seed/plan.ts   asiakkaan luvut — yksi totuuden lähde
+  seed/generate.ts  deterministinen generaattori
+  ledger.ts      mittarit kaavoineen, recompute, 1e-9 toleranssi
+  claims.ts      väitteet johdantoineen + syy-reunat
+  validator.ts   10 sääntöä, slottipohjainen renderöinti
+  review.ts      ranking, claim budget, linssit
+  assemble.ts    build tai kaadu
+tests/           27 testiä: luvut täsmäävät, portti pitää
+seed/customer.json   generoitu datasetti (commitoitu, jotta demo on deterministinen)
+docs/facts.md        generoidut luvut — älä muokkaa käsin
+```
+
+Kolme asiaa jotka koodi todistaa eikä väitä:
+
+1. **Jokainen luku lasketaan uudelleen** kaavastaan ja syötteistään (`npm run verify`).
+2. **53 % on dataa, ei käsikirjoitusta.** Se tulee kaavasta
+   `(mat_delta × baseline_intensity) / water_delta`. Muuta mattotiheyttä, luku muuttuu.
+3. **Portti hylkää oikeasti.** Testi muuttaa väitteen 13,99 % → 14,00 % ja
+   validaattori torjuu lauseen `RECOMPUTE_MISMATCH`:lla.
+
+## Seuraavaksi
+
+`Recommendation` + `Commitment` (silmukka), trade-off explorer, ja UI
+(`docs/03-demo-script.md` on jo spec).
