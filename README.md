@@ -97,8 +97,14 @@ väitteeseensä; luku joka ei täsmää on `UNSOURCED_NUMBER`. Jokainen lause me
 portin läpi kuin käsin kirjoitettu. Jos malli epäonnistuu kahdesti, lause tulee
 pohjasta, ja UI merkitsee kumpi kirjoitti (AI / pohja).
 
+**Kysy katsaukselta:** asiakas tai KAM kysyy omin sanoin. Koodi (ei malli) päättää
+mitkä väitteet kysymys koskee (`src/ask.ts`), malli muotoilee vastauksen niistä,
+portti tarkistaa, ja jokaisesta luvusta pääsee todisteeseen. Vertailu muihin tai
+aihe jota datassa ei ole → rehellinen "ei todennettua dataa".
+
 ```bash
-npm run ui                                  # nappi "Kirjoita selaimessa"
+npm run ui                                  # kysymyskenttä + nappi "Kirjoita selaimessa"
+node scripts/edge-run.mjs ask "Miksi vedenkulutus nousi?"   # kysymys headless-Chromessa
 node scripts/edge-run.mjs balanced 4B       # sama headless-Chromessa, tulostaa tuloksen
 npm run write                               # sama silmukka palvelimella (OpenAI-yhteensopiva, LLM_URL/LLM_MODEL)
 ```

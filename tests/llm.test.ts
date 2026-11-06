@@ -73,3 +73,9 @@ test("every template fallback passes the gate in every lens", () => {
 test("list markers and run-on lines are split into sentences", () => {
   assert.deepEqual(splitSentences("1. Eka lause. Toka lause.\n- Kolmas"), ["Eka lause.", "Toka lause.", "Kolmas"]);
 });
+
+test("a shortened cause name still counts as the cause, an altered one does not", () => {
+  const ids = ["drv:mat-frequency"];
+  assert.equal(slotify("Syy: Mattotiheyden nosto 2 → 3 krt/vko.", ctx, [], ids), "Syy: {{drv:mat-frequency}}.");
+  assert.match(slotify("Syy: Mattotiheyden nosto 2 krt/vko.", ctx, [], ids), /2 krt/);
+});

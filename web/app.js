@@ -6,6 +6,9 @@ const HERO_KEY = "lanka.hero.hidden";
 
 /** edge.js writes the review for whichever lens is open. */
 window.__lankaLens = () => state.lens;
+/** edge.js only offers a proof link when the claim has an observation to open. */
+window.__lankaHasClaim = (id) =>
+  Boolean(state.data) && state.data.lenses.some((l) => state.data.observations[l.id].some((o) => o.claimId === id));
 
 const el = (tag, attrs = {}, ...children) => {
   const node = document.createElement(tag);
@@ -159,6 +162,8 @@ function renderChips() {
 }
 
 function showAnswer(item) {
+  const input = document.getElementById("askInput");
+  if (input) input.value = item.question;
   const host = document.getElementById("answer");
   host.hidden = false;
   host.className = `answer ${item.code ? "bad" : "ok"}`;
