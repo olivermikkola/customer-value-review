@@ -11,6 +11,12 @@ export interface UiData {
   customer: string;
   period: string;
   comparePeriod: string;
+  /** What the reader is looking at, in one line. */
+  scope: { sites: number; periods: number; from: string; to: string };
+  /** Proof that the thing is computed, not typed. */
+  counts: { sources: number; factors: number; measures: number; claims: number };
+  /** Three sentences a first-time reader can act on. Validated like everything else. */
+  takeaways: { claimId: string; text: string }[];
   lenses: { id: Lens; label: string }[];
   observations: Record<Lens, UiObservation[]>;
   recommendations: Recommendation[];
@@ -60,9 +66,33 @@ export interface UiObservation {
   measures: UiMeasure[];
   drivers: { id: string; label: string; share: number | null; amount: string | null; method: string }[];
   narrative: string[];
+  /** Plain-language "what this means", never containing a number. */
+  meaning?: string;
   /** A counterfactual that changes the story, when one exists. */
   check?: string;
 }
+
+/**
+ * The one line that turns a metric into a sentence a human can act on.
+ * Deliberately number-free: the number lives in the claim, not in the prose.
+ */
+const MEANING: Record<string, string> = {
+  "clm:water-intensity-up":
+    "Pesemme saman pyykkikilon kosteammalla tavalla kuin vuosi sitten. Se on tehokkuusongelma, ei vain volyymiongelma.",
+  "clm:water-volume-up":
+    "Pyykkiä tuli enemmän ja vettä kului enemmän. Osa noususta pystytään selittämään, osa ei — ja se sanotaan ääneen.",
+  "clm:loss-cost-up":
+    "Katoamiset maksoivat enemmän kuin mikään muu yksittäinen erä. Taustalla on yksi toimipiste.",
+  "clm:cost-up":
+    "Lasku kasvoi, mutta hitaammin kuin volyymi. Hinta per pesty kilo siis laski.",
+  "clm:linen-up":
+    "Pyykkimäärä kasvoi. Se on hyvä uutinen vain jos lisämyynti kasvoi mukana.",
+  "clm:repair-rate-up":
+    "Korjaukset kasvoivat. Se pidentää vaatteiden elinikää ja on harvoja puhtaita voittoja.",
+  "clm:co2-up": "Päästöt seuraavat vettä. Luku on arvio, ei mittaus — siksi se ei ole kärjessä.",
+  "clm:water-avoided":
+    "Oma pesula olisi kuluttanut moninkertaisesti vettä. Luku on proxy, joten se ei kanna yksin.",
+};
 
 function fmt(n: number, digits: number): string {
   return round(n, digits).toLocaleString("fi-FI", {
@@ -162,6 +192,7 @@ function uiObservation(
       method: d.method,
     })),
     narrative: mine.map((d) => render(`{{drv:${d.id}}}`, ctx).text),
+    meaning: MEANING[claim.id],
     check: checkOk ? render(CHECK_TEXT, ctx).text : undefined,
   };
 }
@@ -228,6 +259,28 @@ export function buildUiData(): UiData {
     };
   });
 
+  // The "so what" a first-time reader needs. Slots keep the numbers in the
+  // ledger; validateSentence keeps the prose honest, exactly like the review.
+  const takeawaySpecs = [
+    {
+      claimId: "clm:water-intensity-up",
+      text: "Veden ominaiskulutus: [[clm:water-intensity-up]]. Mattotiheyden lisäys ei ole syy — vastatarkistus osoittaa sen.",
+    },
+    {
+      claimId: "clm:water-volume-up",
+      text: "Kulutuksen kasvusta selittyy [[clm:water-attribution]]; loput ovat avoimesti selittämättömiä.",
+    },
+    {
+      claimId: "clm:loss-cost-up",
+      text: "Katoamisen kustannus: [[clm:loss-cost-up]] — suurin yksittäinen euromääräinen muutos.",
+    },
+  ];
+
+  const takeaways = takeawaySpecs.flatMap(({ claimId, text }) => {
+    const v = validateSentence(text, ctx);
+    return v.ok ? [{ claimId, text: render(text, ctx).text }] : [];
+  });
+
   const v = (id: string) => idx.measures.get(id)?.value ?? 0;
   const row = (label: string, metric: string, unit: string, digits: number) => {
     const before = v(`mea:${metric}:2025-Q3`);
@@ -244,6 +297,19 @@ export function buildUiData(): UiData {
     customer: seed.customerName,
     period: "Q3 2025",
     comparePeriod: "Q3 2024",
+    scope: {
+      sites: seed.sites.length,
+      periods: 3,
+      from: "Q3 2024",
+      to: "Q4 2025",
+    },
+    counts: {
+      sources: idx.sources.size,
+      factors: idx.factors.size,
+      measures: idx.measures.size,
+      claims: claims.length,
+    },
+    takeaways,
     lenses,
     observations,
     recommendations: recs,
