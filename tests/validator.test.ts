@@ -117,3 +117,10 @@ test("lenses reorder the same claims without changing them", () => {
     new Set(sustainability.map((o) => o.claimId)),
   );
 });
+
+test("a quarter's name is not an unsourced number, but a quantity next to it is", () => {
+  const ctx = ctxOf();
+  assert.equal(validateSentence("Vedenkulutus Q4 oli [[clm:water-q4]].", ctx).ok, true);
+  assert.equal(validateSentence("Vedenkulutus Q4 oli 3902 m³.", ctx).code, "UNSOURCED_NUMBER");
+  assert.equal(validateSentence("Vedenkulutus Q5 oli [[clm:water-q4]].", ctx).code, "UNSOURCED_NUMBER");
+});

@@ -51,10 +51,21 @@ function hits(q: string, stems: string[]): number {
   return stems.filter((s) => q.includes(s)).reduce((sum, s) => sum + s.length, 0);
 }
 
+/**
+ * Which claims and causes a question is about.
+ *
+ * The word lists decide *whether* a question is about this review's data and
+ * which topics are candidates — measured on blind questions, they catch
+ * off-topic ones, which a small embedding model cannot (an off-topic question
+ * scores as close as a real one). When `sims` is given (cosine similarity per
+ * topic, from the browser's embedding model) and the words found several
+ * candidates, meaning decides their order. Without `sims` the words decide alone.
+ */
 export function matchQuestion(
   question: string,
   claims: Claim[],
   drivers: Driver[],
+  sims?: Record<string, number>,
 ): { claimIds: string[]; driverIds: string[]; why: boolean; compare: boolean } {
   const q = ` ${question.toLowerCase()} `;
   const byId = new Map(claims.map((c) => [c.id, c]));
@@ -77,12 +88,26 @@ export function matchQuestion(
   }
 
   scored.sort((a, b) => b.score - a.score || byId.get(b.id)!.materiality - byId.get(a.id)!.materiality);
-  const claimIds = scored.slice(0, 2).map((x) => x.id);
+  let claimIds = scored.slice(0, 2).map((x) => x.id);
+
+  // Meaning only chooses between topics the words already found — it never brings in one the question
+  // did not mention (measured: it ranked the Q4 water figure first for "Miksi laskumme nousi?").
+  if (sims && scored.length > 1 && driverIds.length === 0) {
+    claimIds = scored
+      .map((x) => x.id)
+      .sort((a, b) => (sims[b] ?? 0) - (sims[a] ?? 0))
+      .slice(0, 2);
+  }
   return { claimIds, driverIds, why: WHY_RE.test(q), compare: COMPARE_RE.test(q) };
 }
 
-export function askTask(question: string, claims: Claim[], drivers: Driver[]): AskResult {
-  const m = matchQuestion(question, claims, drivers);
+export function askTask(
+  question: string,
+  claims: Claim[],
+  drivers: Driver[],
+  sims?: Record<string, number>,
+): AskResult {
+  const m = matchQuestion(question, claims, drivers, sims);
   const byId = new Map(claims.map((c) => [c.id, c]));
 
   if (m.compare && !claims.some((c) => c.kind === "benchmark" || c.benchmarkMeasureId)) {

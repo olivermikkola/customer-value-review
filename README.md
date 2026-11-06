@@ -98,7 +98,11 @@ portin läpi kuin käsin kirjoitettu. Jos malli epäonnistuu kahdesti, lause tul
 pohjasta, ja UI merkitsee kumpi kirjoitti (AI / pohja).
 
 **Kysy katsaukselta:** asiakas tai KAM kysyy omin sanoin. Koodi (ei malli) päättää
-mitkä väitteet kysymys koskee (`src/ask.ts`), malli muotoilee vastauksen niistä,
+mitkä väitteet kysymys koskee (`src/ask.ts`). Toinen pieni malli selaimessa
+(EmbeddingGemma 300M, ~195 Mt, `web/semantic.js`) lukee kysymyksen merkityksen ja
+järjestää sanalistojen löytämät aiheet; se ei koskaan tuo aihetta, jota kysymys ei
+maininnut, eikä päätä vastataanko. Mitattu 40 sokkokysymyksellä
+(`node scripts/ask-eval.ts`): oikea fakta ensin 27 → 32 / 40. Kielimalli muotoilee vastauksen,
 portti tarkistaa, ja jokaisesta luvusta pääsee todisteeseen. Vertailu muihin tai
 aihe jota datassa ei ole → rehellinen "ei todennettua dataa".
 
