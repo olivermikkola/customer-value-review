@@ -109,7 +109,7 @@ function cmdFacts(): void {
     "|---|---|---|---|",
     ...claims.map(
       (x: Claim) =>
-        `| \`${x.id}\` | ${fmt(x.stated.value, 2)} ${x.stated.unit} | ${x.confidence} | ${fmt(x.materiality, 2)} |`,
+        `| \`${x.id}\` | ${fmt(x.stated.value, x.stated.unit === "m3/kg" ? 4 : 2)} ${x.stated.unit} | ${x.confidence} | ${fmt(x.materiality, 2)} |`,
     ),
     "",
     "## Kerroin, joka on heikoin lenkki",

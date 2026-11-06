@@ -58,7 +58,7 @@ osuitte niihin kaikkiin **eksplisiittisesti**, ei "sivutuotteena".
 
 | Briefin sana | Mitä se tarkoittaa | Missä se näkyy demossa |
 |---|---|---|
-| **Personalised analytics** | Sama totuus, eri linssi | Linssinvaihto: CFO / vastuullisuus / työmaapäällikkö / HR |
+| **Personalised analytics** | Sama totuus, eri linssi | Linssinvaihto: vastuullisuus / tasapainoinen / talous — sama data, eri järjestys |
 | **Traceable calculations** | Ei lukua ilman lähdettä | Klikkaus väitteestä → kaava → raakatapahtuma; kerroinversio näkyvissä |
 | **Decision support** | Ei havaintoa ilman tekoa | Jokainen havainto päättyy ehdotukseen + vaikutusarvio + trade-off |
 | **Interfaces** | Katsaus on tila, ei PDF | Jaettu lanka, jossa sekä account team että asiakas |

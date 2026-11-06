@@ -238,6 +238,24 @@ const SPECS: Spec[] = [
     unit: "m3",
     scale: 1000,
   },
+  {
+    id: "clm:water-q4",
+    kind: "level",
+    metricId: "water_m3",
+    label: "Vedenkulutus Q4",
+    derivation: { kind: "level", measureId: "mea:water_m3:2025-Q4" },
+    unit: "m3",
+    scale: 4000,
+  },
+  {
+    id: "clm:intensity-counterfactual",
+    kind: "level",
+    metricId: "water_intensity_counterfactual",
+    label: "Ominaiskulutus ilman mattotiheyttä",
+    derivation: { kind: "level", measureId: "mea:water_intensity_counterfactual:2025-Q3" },
+    unit: "m3/kg",
+    scale: 0.01,
+  },
 ];
 
 export function buildClaims(idx: RefIndex, customerId: string): Claim[] {

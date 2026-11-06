@@ -408,6 +408,26 @@ export function buildMeasures(seed: Seed): BuiltLedger {
     confidence: "measured",
   });
 
+  // The counterfactual that kills the naive story: if the mats had NOT been
+  // added, intensity would have been HIGHER than it is. So the mat increase
+  // does not explain the intensity rise — it slightly offsets it.
+  addMeasure(idx, {
+    id: "mea:water_intensity_counterfactual:2025-Q3",
+    metricId: "water_intensity_counterfactual",
+    label: "Ominaiskulutus ilman mattotiheyden nostoa",
+    scope: all,
+    period: q("2025-Q3"),
+    unit: "m3/kg",
+    formula: "(water - attributable) / (linen - mat_delta)",
+    bindings: {
+      water: "mea:water_m3:2025-Q3",
+      attributable: "mea:water_attributable_m3:2025-Q3",
+      linen: "mea:linen_kg:2025-Q3",
+      mat_delta: "mea:mat_delta_kg:2024-Q3->2025-Q3",
+    },
+    confidence: "estimated",
+  });
+
   const measures = [...idx.measures.values()];
   return { idx, measures };
 }
