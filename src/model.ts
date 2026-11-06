@@ -148,12 +148,25 @@ export interface Observation {
 export interface Recommendation {
   id: string;
   observationId: string;
+  title: string;
   action: string;
+  /** Why this option and not the others — one sentence, no hedging. */
+  rationale: string;
   expectedImpact: { metricId: string; delta: number; unit: string }[];
   effort: "low" | "medium" | "high";
   confidence: Confidence;
   /** What gets worse if you take this. Never empty in a real trade-off. */
-  tradeoffs: { metricId: string; delta: number; unit: string; note?: string }[];
+  tradeoffs: { metricId: string; delta: number; unit: string; note: string }[];
+  /** False when this dataset cannot measure the outcome — say so, don't guess. */
+  measurable: boolean;
+  baselineMeasureId?: string;
+  resultMeasureId?: string;
+  target?: {
+    metricId: string;
+    delta: number;
+    unit: string;
+    betterWhen: "lower" | "higher";
+  };
 }
 
 export interface Commitment {
@@ -162,10 +175,22 @@ export interface Commitment {
   acceptedBy: "customer" | "account_team" | "both";
   acceptedAt: string;
   baselineMeasureId: string;
-  target: { metricId: string; delta: number; unit: string };
+  target: { metricId: string; delta: number; unit: string; betterWhen: "lower" | "higher" };
   reviewDate: string;
   status: "open" | "measured" | "missed";
   resultMeasureId?: string;
+}
+
+/** The point of the whole loop: did the thing we agreed actually work? */
+export interface CommitmentProgress {
+  actualDelta: number;
+  targetDelta: number;
+  unit: string;
+  met: boolean;
+  baselineValue: number;
+  resultValue: number;
+  /** How the result is described in the next review. */
+  verdict: "measured" | "missed" | "open";
 }
 
 export interface Ledger {

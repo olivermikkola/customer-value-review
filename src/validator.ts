@@ -62,6 +62,8 @@ function decimalsFor(claim: Claim, override?: number): number {
       return 1;
     case "m3":
       return 0;
+    case "m3/kg":
+      return 4;
     case "EUR":
       return 0;
     case "kg":
@@ -70,6 +72,11 @@ function decimalsFor(claim: Claim, override?: number): number {
     default:
       return 1;
   }
+}
+
+/** The one place a claim value becomes human text. UI and validator share it. */
+export function formatClaim(claim: Claim): string {
+  return formatClaimValue(claim, decimalsFor(claim));
 }
 
 export function formatClaimValue(claim: Claim, decimals: number): string {
@@ -87,6 +94,8 @@ export function formatClaimValue(claim: Claim, decimals: number): string {
       return `${body} €`;
     case "m3":
       return `${body} m³`;
+    case "m3/kg":
+      return `${body} m³/kg`;
     case "kg":
       return `${body} kg`;
     case "kgCO2e":

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LANKA · asiakaskatsaus</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <span class="mark">LANKA</span>
+        <span class="customer" id="customer"></span>
+      </div>
+      <div class="lens" id="lens" role="tablist" aria-label="Näkökulma"></div>
+    </header>
+
+    <div class="askbar">
+      <span class="ask-label">Kysy katsaukselta</span>
+      <div class="chips" id="chips"></div>
+      <div class="answer" id="answer" hidden></div>
+    </div>
+
+    <main class="grid">
+      <section class="col-list">
+        <div class="col-head">
+          <h2>Havainnot</h2>
+          <span class="muted" id="period"></span>
+        </div>
+        <div id="list"></div>
+        <p class="hint">
+          Kolme havaintoa, ei neljääkymmentä sivua. Jokainen aukeaa väitteestä laskentaan
+          ja raakatapahtumaan.
+        </p>
+      </section>
+
+      <section class="col-detail" id="detail"></section>
+    </main>
+
+    <footer class="ledger" id="ledger"></footer>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

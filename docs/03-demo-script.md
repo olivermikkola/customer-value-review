@@ -7,7 +7,7 @@ Kaikki luvut ovat samat kuin `02-data-model-and-validator.md` — älkää vaiht
 
 Demo kaatuu jos data elää. Lukitkaa:
 
-- [ ] Seedattu datasetti commitoitu repoon (`seed/q3.json`)
+- [ ] Seedattu datasetti commitoitu repoon (`seed/customer.json`)
 - [ ] Laskenta ajettu etukäteen, tulokset tallennettu — UI lukee tallennetut, ei laske lennossa
 - [ ] LLM-narratiivi **kahdessa moodissa**: live ja `cached/` (sama sisältö, validaattori ajettu läpi)
 - [ ] Verkkoyhteys ei ole missään kriittisessä polussa
@@ -42,51 +42,59 @@ emme dioihin."
 kolmeen havaintoon — ei neljäänkymmeneen sivuun. Järjestelmä on jo rankannut ne:
 materiaalisuus × uutuus × tehtävyys."
 
-*(näkyy: 3 korttia. Oletusjärjestys: katoaminen, vesi, korjaussuhde — eniten rahaa
-liikuttava ensin)*
+*(näkyy: 3 korttia. Oletuslinssi on vastuullisuus, joten vesi on kärjessä)*
 
-**A:** "Kolme havaintoa, ei neljääkymmentä sivua. Järjestelmä on jo rankannut ne:
-materiaalisuus × uutuus × tehtävyys. Talouslinssillä kärjessä on katoaminen. Mutta
-vaihdetaan vastuullisuuslinssiin — sama data, sama totuus, eri järjestys."
+**A:** "Oletus on vastuullisuuslinssi: kärjessä on vesi. Vaihdetaan talouslinssiin —
+sama data, sama totuus, eri järjestys."
 
-*(klikkaa linssiä. Kortit järjestyvät uudelleen: vesi nousee ensimmäiseksi)*
+*(klikkaa linssiä. Kortit järjestyvät uudelleen: katoaminen nousee ensimmäiseksi)*
 
-### 1:20–2:20 — Havainto 1: kolme syvyyttä
+**A:** "Kumpikaan järjestys ei ole väärä. Painotus on lukijan, ei toimittajan."
 
-**A:** "Ensimmäinen: veden ominaiskulutus nousi 14,0 prosenttia."
+### 1:20–2:05 — Havainto 1: kolme syvyyttä
+
+**A:** "Vastuullisuuslinssillä ensimmäinen: veden ominaiskulutus nousi 14,0 prosenttia."
 
 *(klikkaa korttia → taso 2: kaava ja luvut)*
 "Neljä tuhatta kaksisataakymmenen kuutiota jaettuna 38 400 kilolla pyykkiä.
 Kerroin on versioitu — v3, Espoon pesulan mittaridata. Vertailujakso on sama
-kvartaali vuosi sitten: 0,096."
+kvartaali vuosi sitten: 0,0962."
 
-**A:** *(klikkaa "miksi?" → taso 3: driver)*
-"Ja tässä tärkein kohta koko demossa. Järjestelmä sanoo: mattotiheyden nosto kahdella
-toimipisteellä selittää **noin 53 prosenttia**. Ei sata. Loput 344 kuutiota ajoittuu
+*(vierittää Vastatarkistus-korttiin)*
+"Ja tässä tärkein kohta koko demossa. Intuitio sanoo: mattoja pestiin enemmän,
+siksi ominaiskulutus nousi. Järjestelmä laskee vastatarkistuksen: ilman
+mattotiheyden nostoa ominaiskulutus olisi ollut **0,1112** — korkeampi kuin
+toteutunut 0,1096. Matto ei siis selittänyt nousua. Se oli nousun vastavoima."
+
+### 2:05–2:50 — Missä selitys loppuu
+
+**A:** *(avaa kolmannen kortin, Veden kokonaiskulutus)*
+"Kokonaiskulutus sentään selittyy osin: mattotiheyden nosto kahdella toimipisteellä
+selittää **53,4 prosenttia** noususta. Ei sata. Loput 344 kuutiota ajoittuu
 pesulan vajaiden kuormien jaksoon — ja se lukee ruudulla sanoilla *syytä ei ole
 vahvistettu*."
 
 **B:** "Se myönnytys on tuote. Katsaus joka selittää kaiken on katsaus jota kukaan
 ei usko kolmatta kvartaalia."
 
-### 2:20–2:50 — Validaattori (15 s, iso vaikutus)
+### 2:50–3:20 — Validaattori (15 s, iso vaikutus)
 
 **A:** "Mutta entä jos kielimalli yrittää kaunistella? Kokeillaan."
-*(kirjoittaa kyselykenttään: "Kerro miksi vesi nousi")*
+*(klikkaa kysymysnappia: "Ollaanko me parempia kuin muut?")*
 
-*(ruudulle ilmestyy punainen kortti: `UNSUPPORTED_CAUSAL` — "väitteellä
-clm:water-intensity-up-q3 ei ole vahvistettua syy-yhteyttä")*
+*(ruudulle ilmestyy punainen kortti: `UNSUPPORTED_SUPERLATIVE` — ylisana ilman
+vertailudataa)*
 
-**A:** "Hylätty. Malli ei saa sanoa 'johtui' ilman eksplisiittistä syy-reunaa.
-Se saa sanoa 'ajoittuu samaan aikaan'. Tämä ei ole kauneusvirhe — tämä on
-greenwashing-suoja, ja se on sama sääntö jota EU:n green claims -vaatimukset
-käytännössä pyytävät."
+**A:** "Hylätty. Malli ei saa sanoa 'parempi kuin muut', koska meillä ei ole
+vertaisdataa. Se saa sanoa vain sen minkä pystymme todistamaan. Tämä ei ole
+kauneusvirhe — tämä on greenwashing-suoja, ja se on sama sääntö jota EU:n
+green claims -vaatimukset käytännössä pyytävät."
 
-### 2:50–3:40 — Trade-off ja ansa
+### 3:20–3:55 — Trade-off ja ansa
 
 **A:** *(avaa trade-off explorerin)*
 "Kolme vaihtoehtoa. A: pudota mattotiheys takaisin kahteen kertaan viikossa —
-vesi alas neljä prosenttia, mutta palvelutaso laskee ja liukastumisriski nousee.
+vesi alas 9,4 prosenttia, mutta palvelutaso laskee ja liukastumisriski nousee.
 C: vaihda kevyempään mattoon — vesi alas kuusi prosenttia."
 
 **B:** "C näyttää voitolta. Mutta katso toista saraketta."
@@ -95,18 +103,18 @@ C: vaihda kevyempään mattoon — vesi alas kuusi prosenttia."
 "Kevyempi matto kestää 20 prosenttia vähemmän pesuja. Elinkaaren CO₂ nousee
 kahdeksan prosenttia. Järjestelmä merkitsee sen itse: *rebound-vaikutus*."
 
-**A:** "Valitaan B: säilytetään tiheys, optimoidaan eräkoko. Vesi alas 9,2 prosenttia,
-palvelutaso ennallaan, ei lisäkustannusta."
+**A:** "Valitaan B: säilytetään tiheys, optimoidaan eräkoko. Tavoite −8 prosenttia
+ominaiskulutuksessa, palvelutaso ennallaan, ei lisäkustannusta."
 
-### 3:40–4:10 — Sitoumus ja silmukka
+### 3:55–4:25 — Sitoumus ja silmukka
 
-**A:** *(klikkaa "hyväksy")*
+**A:** *(klikkaa "hyväksy ja seuraa")*
 "Tästä tulee sitoumus. Baseline tallennettu, tavoite −8 prosenttia, seurantapäivä
 seuraava katsaus."
 
 *(hyppää ajassa eteenpäin — nappi "siirry Q4:ään")*
 "Ja tässä se mikä erottaa katsauksen raportista: **mitattiin**. −9,2 prosenttia,
-palvelutaso ennallaan, sitoumus suljettu."
+tavoite ylitetty, palvelutaso ennallaan."
 
 **B:** "Katsaus ei ole dokumentti. Se on silmukka, joka sulkeutuu vasta kun vaikutus
 on mitattu."
@@ -141,8 +149,8 @@ Kiitos."
 Pudota tarkalleen tämä, tässä järjestyksessä:
 
 1. Dia 2 → yhdeksi lauseeksi ("arvo on vertailu, todiste ja teko")
-2. Validaattori-beat 2:20–2:50 → lyhennä 10 sekuntiin: näytä pelkkä punainen
-   hylkäyskortti, älä selitä sääntöjä
+2. Validaattori-beat → lyhennä 10 sekuntiin: näytä pelkkä punainen
+   hylkäyskortti (`UNSUPPORTED_SUPERLATIVE`), älä selitä sääntöjä
 3. Trade-off → näytä vain B ja C, yksi lause reboundista
 4. Arkkitehtuuri → yksi lause: "kielimalli ei laske"
 5. Lopetus → jätä vertaisdata pois, pidä "silmukka" -lause

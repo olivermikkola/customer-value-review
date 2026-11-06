@@ -2588,6 +2588,1272 @@
       "ref": "kierto/tapiola/2025-Q3",
       "ingestedAt": "2025-10-06T08:00:00Z",
       "checksum": "d6d3a71a24581be6"
+    },
+    {
+      "id": "src:pickup:kamppi:mats:2025-10",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 548,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/mats/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "b25cc286cb4e1dd9"
+    },
+    {
+      "id": "src:pickup:kamppi:mats:2025-11",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 540,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/mats/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "7432fa2855be320d"
+    },
+    {
+      "id": "src:pickup:kamppi:mats:2025-12",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 542,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/mats/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "1f7a5e5679fe4baf"
+    },
+    {
+      "id": "src:pickup:kamppi:workwear:2025-10",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 635,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/workwear/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "4c34c65de370d7b3"
+    },
+    {
+      "id": "src:pickup:kamppi:workwear:2025-11",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 626,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/workwear/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "0dd2a554b1a9939e"
+    },
+    {
+      "id": "src:pickup:kamppi:workwear:2025-12",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 629,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/workwear/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "ec86888dd74fb261"
+    },
+    {
+      "id": "src:pickup:kamppi:restaurant_textiles:2025-10",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 1183,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/restaurant_textiles/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "ccad29959143c3f4"
+    },
+    {
+      "id": "src:pickup:kamppi:restaurant_textiles:2025-11",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 1165,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/restaurant_textiles/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "3e26e0ec445faec3"
+    },
+    {
+      "id": "src:pickup:kamppi:restaurant_textiles:2025-12",
+      "kind": "pickup",
+      "siteId": "site:kamppi",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 1172,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kamppi/restaurant_textiles/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "88cdf9a9794f2b7e"
+    },
+    {
+      "id": "src:pickup:kallio:mats:2025-10",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 447,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/mats/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "ac26fd0804a183be"
+    },
+    {
+      "id": "src:pickup:kallio:mats:2025-11",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 440,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/mats/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "e6bba7f54d2a4536"
+    },
+    {
+      "id": "src:pickup:kallio:mats:2025-12",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 443,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/mats/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "302674306e9fe819"
+    },
+    {
+      "id": "src:pickup:kallio:workwear:2025-10",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 564,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/workwear/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "dab945f080bf5def"
+    },
+    {
+      "id": "src:pickup:kallio:workwear:2025-11",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 556,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/workwear/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "aa4cb9132fec4d1b"
+    },
+    {
+      "id": "src:pickup:kallio:workwear:2025-12",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 560,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/workwear/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "9da64b5550df239e"
+    },
+    {
+      "id": "src:pickup:kallio:restaurant_textiles:2025-10",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 1011,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/restaurant_textiles/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "927bdceaedca1dfd"
+    },
+    {
+      "id": "src:pickup:kallio:restaurant_textiles:2025-11",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 996,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/restaurant_textiles/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "426527d6971c3d48"
+    },
+    {
+      "id": "src:pickup:kallio:restaurant_textiles:2025-12",
+      "kind": "pickup",
+      "siteId": "site:kallio",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 1003,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/kallio/restaurant_textiles/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "90ea89bed9941192"
+    },
+    {
+      "id": "src:pickup:toolo:mats:2025-10",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 430,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/mats/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "073704fbb08ed863"
+    },
+    {
+      "id": "src:pickup:toolo:mats:2025-11",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 424,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/mats/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "20cdaa98689b4e89"
+    },
+    {
+      "id": "src:pickup:toolo:mats:2025-12",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 426,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/mats/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "251a91e25d93839a"
+    },
+    {
+      "id": "src:pickup:toolo:workwear:2025-10",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 531,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/workwear/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "41eceb6a81abcaa6"
+    },
+    {
+      "id": "src:pickup:toolo:workwear:2025-11",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 523,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/workwear/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "4571ae35c6f49833"
+    },
+    {
+      "id": "src:pickup:toolo:workwear:2025-12",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 526,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/workwear/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "83cf1f716c98dc25"
+    },
+    {
+      "id": "src:pickup:toolo:restaurant_textiles:2025-10",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 890,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/restaurant_textiles/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "64db7aecf625367a"
+    },
+    {
+      "id": "src:pickup:toolo:restaurant_textiles:2025-11",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 877,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/restaurant_textiles/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "627c76e1ac0e528d"
+    },
+    {
+      "id": "src:pickup:toolo:restaurant_textiles:2025-12",
+      "kind": "pickup",
+      "siteId": "site:toolo",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 883,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/toolo/restaurant_textiles/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "82df0dbb712b0e8a"
+    },
+    {
+      "id": "src:pickup:espoo:mats:2025-10",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 1445,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/mats/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "6ffe41819f50cd5e"
+    },
+    {
+      "id": "src:pickup:espoo:mats:2025-11",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 1423,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/mats/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "5b3824d7378ba1cc"
+    },
+    {
+      "id": "src:pickup:espoo:mats:2025-12",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 1432,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/mats/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "a61c11406fbf8e0d"
+    },
+    {
+      "id": "src:pickup:espoo:workwear:2025-10",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 585,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/workwear/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "b5c7b338712e1d37"
+    },
+    {
+      "id": "src:pickup:espoo:workwear:2025-11",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 576,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/workwear/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "00bc1b2f434710e5"
+    },
+    {
+      "id": "src:pickup:espoo:workwear:2025-12",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 579,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/workwear/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "eb0ef4c46fb57194"
+    },
+    {
+      "id": "src:pickup:espoo:restaurant_textiles:2025-10",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 816,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/restaurant_textiles/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "002aeb7ce8eab241"
+    },
+    {
+      "id": "src:pickup:espoo:restaurant_textiles:2025-11",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 804,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/restaurant_textiles/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "45c8bf2fe9e97bba"
+    },
+    {
+      "id": "src:pickup:espoo:restaurant_textiles:2025-12",
+      "kind": "pickup",
+      "siteId": "site:espoo",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 810,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/espoo/restaurant_textiles/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "76b010e8874c9b3c"
+    },
+    {
+      "id": "src:pickup:vantaa:mats:2025-10",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 1203,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/mats/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "dff51b20a608e358"
+    },
+    {
+      "id": "src:pickup:vantaa:mats:2025-11",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 1185,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/mats/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "8a3454320962c5df"
+    },
+    {
+      "id": "src:pickup:vantaa:mats:2025-12",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 1192,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/mats/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "ce6494dc30fb699b"
+    },
+    {
+      "id": "src:pickup:vantaa:workwear:2025-10",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 551,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/workwear/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "e67ecc3e2843f85e"
+    },
+    {
+      "id": "src:pickup:vantaa:workwear:2025-11",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 543,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/workwear/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "5c7925bae966f359"
+    },
+    {
+      "id": "src:pickup:vantaa:workwear:2025-12",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 546,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/workwear/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "1e758c46850146f5"
+    },
+    {
+      "id": "src:pickup:vantaa:restaurant_textiles:2025-10",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 783,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/restaurant_textiles/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "2215516c8adec48d"
+    },
+    {
+      "id": "src:pickup:vantaa:restaurant_textiles:2025-11",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 771,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/restaurant_textiles/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "1ef1dcf2aee96ca6"
+    },
+    {
+      "id": "src:pickup:vantaa:restaurant_textiles:2025-12",
+      "kind": "pickup",
+      "siteId": "site:vantaa",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 776,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/vantaa/restaurant_textiles/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "54e5f6dc82350f9d"
+    },
+    {
+      "id": "src:pickup:tapiola:mats:2025-10",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 396,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/mats/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "50151d1973ea5338"
+    },
+    {
+      "id": "src:pickup:tapiola:mats:2025-11",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 391,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/mats/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "3fe70a9b9c14d5ef"
+    },
+    {
+      "id": "src:pickup:tapiola:mats:2025-12",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:mats",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 393,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/mats/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "eef5be3aac96b65d"
+    },
+    {
+      "id": "src:pickup:tapiola:workwear:2025-10",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 464,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/workwear/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "50feca2ab284d2b7"
+    },
+    {
+      "id": "src:pickup:tapiola:workwear:2025-11",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 457,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/workwear/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "359fc6c4e2f737dd"
+    },
+    {
+      "id": "src:pickup:tapiola:workwear:2025-12",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:workwear",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 459,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/workwear/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "e18170bfd1e964da"
+    },
+    {
+      "id": "src:pickup:tapiola:restaurant_textiles:2025-10",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 689,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/restaurant_textiles/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "d2ab33ced03c78e7"
+    },
+    {
+      "id": "src:pickup:tapiola:restaurant_textiles:2025-11",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 679,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/restaurant_textiles/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "6c48f673bf169466"
+    },
+    {
+      "id": "src:pickup:tapiola:restaurant_textiles:2025-12",
+      "kind": "pickup",
+      "siteId": "site:tapiola",
+      "serviceId": "svc:restaurant_textiles",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 682,
+      "unit": "kg",
+      "granularity": "period",
+      "ref": "nouto/tapiola/restaurant_textiles/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "dd0ca6d359bf28fa"
+    },
+    {
+      "id": "src:laundry:espoo:water:2025-10",
+      "kind": "meter",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-10-31"
+      },
+      "value": 1301,
+      "unit": "m3",
+      "granularity": "daily",
+      "ref": "mittari/laundry:espoo/vesi/2025-10",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "8023cad5b2496c9c"
+    },
+    {
+      "id": "src:laundry:espoo:water:2025-11",
+      "kind": "meter",
+      "period": {
+        "from": "2025-11-01",
+        "to": "2025-11-30"
+      },
+      "value": 1301,
+      "unit": "m3",
+      "granularity": "daily",
+      "ref": "mittari/laundry:espoo/vesi/2025-11",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "9cec166602874304"
+    },
+    {
+      "id": "src:laundry:espoo:water:2025-12",
+      "kind": "meter",
+      "period": {
+        "from": "2025-12-01",
+        "to": "2025-12-31"
+      },
+      "value": 1300,
+      "unit": "m3",
+      "granularity": "daily",
+      "ref": "mittari/laundry:espoo/vesi/2025-12",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "8ae26e8549301859"
+    },
+    {
+      "id": "src:invoice:kamppi:2025-Q4",
+      "kind": "invoice",
+      "siteId": "site:kamppi",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 14471.2,
+      "unit": "EUR",
+      "granularity": "period",
+      "ref": "lasku/kamppi/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "808e4d0b351a4ea7"
+    },
+    {
+      "id": "src:invoice:kallio:2025-Q4",
+      "kind": "invoice",
+      "siteId": "site:kallio",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 12400.6,
+      "unit": "EUR",
+      "granularity": "period",
+      "ref": "lasku/kallio/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "a3d52034af64bf02"
+    },
+    {
+      "id": "src:invoice:toolo:2025-Q4",
+      "kind": "invoice",
+      "siteId": "site:toolo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 11365.3,
+      "unit": "EUR",
+      "granularity": "period",
+      "ref": "lasku/toolo/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "70f6eb81535bc5a8"
+    },
+    {
+      "id": "src:invoice:espoo:2025-Q4",
+      "kind": "invoice",
+      "siteId": "site:espoo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 17374.1,
+      "unit": "EUR",
+      "granularity": "period",
+      "ref": "lasku/espoo/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "665a2a1fd5459af2"
+    },
+    {
+      "id": "src:invoice:vantaa:2025-Q4",
+      "kind": "invoice",
+      "siteId": "site:vantaa",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 15506.5,
+      "unit": "EUR",
+      "granularity": "period",
+      "ref": "lasku/vantaa/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "ad7cc066fe7cbd05"
+    },
+    {
+      "id": "src:invoice:tapiola:2025-Q4",
+      "kind": "invoice",
+      "siteId": "site:tapiola",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 9538.3,
+      "unit": "EUR",
+      "granularity": "period",
+      "ref": "lasku/tapiola/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "a87e4c91a0989f4f"
+    },
+    {
+      "id": "src:loss:kamppi:2025-Q4",
+      "kind": "loss",
+      "siteId": "site:kamppi",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 18,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "havainto/kamppi/katoaminen/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "00bb2677062c2478"
+    },
+    {
+      "id": "src:repair:kamppi:2025-Q4",
+      "kind": "repair",
+      "siteId": "site:kamppi",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 80,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "korjaus/kamppi/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "71182efbdc4972a8"
+    },
+    {
+      "id": "src:issued:kamppi:2025-Q4",
+      "kind": "assignment",
+      "siteId": "site:kamppi",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 405,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "kierto/kamppi/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "5826429c6665aa61"
+    },
+    {
+      "id": "src:loss:kallio:2025-Q4",
+      "kind": "loss",
+      "siteId": "site:kallio",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 15,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "havainto/kallio/katoaminen/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "05469d2c7dbedab3"
+    },
+    {
+      "id": "src:repair:kallio:2025-Q4",
+      "kind": "repair",
+      "siteId": "site:kallio",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 68,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "korjaus/kallio/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "b2a260294cbcc7e8"
+    },
+    {
+      "id": "src:issued:kallio:2025-Q4",
+      "kind": "assignment",
+      "siteId": "site:kallio",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 340,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "kierto/kallio/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "cd3b14560c208d0d"
+    },
+    {
+      "id": "src:loss:toolo:2025-Q4",
+      "kind": "loss",
+      "siteId": "site:toolo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 13,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "havainto/toolo/katoaminen/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "4d35c9b9753bf1b5"
+    },
+    {
+      "id": "src:repair:toolo:2025-Q4",
+      "kind": "repair",
+      "siteId": "site:toolo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 61,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "korjaus/toolo/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "82f24b3ab03af5a1"
+    },
+    {
+      "id": "src:issued:toolo:2025-Q4",
+      "kind": "assignment",
+      "siteId": "site:toolo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 320,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "kierto/toolo/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "6a1838ff15fd7108"
+    },
+    {
+      "id": "src:loss:espoo:2025-Q4",
+      "kind": "loss",
+      "siteId": "site:espoo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 21,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "havainto/espoo/katoaminen/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "cc32439c4bdc2901"
+    },
+    {
+      "id": "src:repair:espoo:2025-Q4",
+      "kind": "repair",
+      "siteId": "site:espoo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 88,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "korjaus/espoo/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "6b4d8edc8bc94ec8"
+    },
+    {
+      "id": "src:issued:espoo:2025-Q4",
+      "kind": "assignment",
+      "siteId": "site:espoo",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 470,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "kierto/espoo/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "120852c5962ca3c8"
+    },
+    {
+      "id": "src:loss:vantaa:2025-Q4",
+      "kind": "loss",
+      "siteId": "site:vantaa",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 16,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "havainto/vantaa/katoaminen/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "9a14b8c94a051bbb"
+    },
+    {
+      "id": "src:repair:vantaa:2025-Q4",
+      "kind": "repair",
+      "siteId": "site:vantaa",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 76,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "korjaus/vantaa/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "5e7d1ea26ece3426"
+    },
+    {
+      "id": "src:issued:vantaa:2025-Q4",
+      "kind": "assignment",
+      "siteId": "site:vantaa",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 440,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "kierto/vantaa/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "2fc6ca06c898d1c6"
+    },
+    {
+      "id": "src:loss:tapiola:2025-Q4",
+      "kind": "loss",
+      "siteId": "site:tapiola",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 44,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "havainto/tapiola/katoaminen/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "fc862e397a886272"
+    },
+    {
+      "id": "src:repair:tapiola:2025-Q4",
+      "kind": "repair",
+      "siteId": "site:tapiola",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 50,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "korjaus/tapiola/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "87ebe1a433dc3570"
+    },
+    {
+      "id": "src:issued:tapiola:2025-Q4",
+      "kind": "assignment",
+      "siteId": "site:tapiola",
+      "period": {
+        "from": "2025-10-01",
+        "to": "2025-12-31"
+      },
+      "value": 400,
+      "unit": "kpl",
+      "granularity": "period",
+      "ref": "kierto/tapiola/2025-Q4",
+      "ingestedAt": "2025-10-06T08:00:00Z",
+      "checksum": "2c22b6dd64c27e4c"
     }
   ],
   "factors": [
@@ -2630,6 +3896,10 @@
     "2025-Q3": {
       "from": "2025-07-01",
       "to": "2025-09-30"
+    },
+    "2025-Q4": {
+      "from": "2025-10-01",
+      "to": "2025-12-31"
     }
   }
 }

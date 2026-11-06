@@ -36,6 +36,8 @@
 | `clm:water-avoided` | 8 078,00 m3 | proxy | 0,40 |
 | `clm:water-attribution` | 53,43 % | measured | 0,53 |
 | `clm:water-unattributed` | 343,67 m3 | measured | 0,34 |
+| `clm:water-q4` | 3 902,00 m3 | measured | 0,98 |
+| `clm:intensity-counterfactual` | 0,1112 m3/kg | estimated | 1,00 |
 
 ## Kerroin, joka on heikoin lenkki
 
