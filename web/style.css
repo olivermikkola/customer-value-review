@@ -188,6 +188,66 @@ h3 {
   color: var(--green);
 }
 
+.edge {
+  padding: 14px 28px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.edge-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edge-head h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.edge p {
+  margin: 6px 0;
+  font-size: 13px;
+}
+
+.edge ul {
+  margin: 6px 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.edge .by {
+  display: inline-block;
+  min-width: 38px;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 1px 6px;
+  margin-right: 4px;
+}
+
+.edge .by-model {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.edge .by-template {
+  background: var(--line);
+  color: var(--muted);
+}
+
+.edge-bad li {
+  color: var(--muted);
+}
+
+.edge-bad .code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--red);
+}
+
 .answer {
   flex-basis: 100%;
   border-radius: 10px;

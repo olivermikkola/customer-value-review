@@ -8,6 +8,7 @@
     "seed": "node src/cli.ts seed",
     "facts": "node src/cli.ts facts",
     "review": "node src/cli.ts review",
+    "write": "node src/cli.ts write",
     "verify": "node src/cli.ts verify",
     "ui": "node src/server.ts",
     "typecheck": "tsc --noEmit",
@@ -20,7 +21,9 @@
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.10.2",
+    "esbuild": "^0.28.2",
     "jsdom": "^25.0.1",
+    "playwright-core": "^1.65.0",
     "typescript": "^5.7.2"
   }
 }

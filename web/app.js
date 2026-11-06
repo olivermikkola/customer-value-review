@@ -4,6 +4,9 @@ const state = { data: null, lens: "sustainability", selected: null, accepted: fa
 
 const HERO_KEY = "lanka.hero.hidden";
 
+/** edge.js writes the review for whichever lens is open. */
+window.__lankaLens = () => state.lens;
+
 const el = (tag, attrs = {}, ...children) => {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {

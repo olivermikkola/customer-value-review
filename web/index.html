@@ -55,6 +55,18 @@
       <div class="answer" id="answer" role="status" aria-live="polite" hidden></div>
     </div>
 
+    <section class="edge" aria-labelledby="edgeTitle">
+      <div class="edge-head">
+        <h2 id="edgeTitle">Katsaus tekoälyn kirjoittamana</h2>
+        <button class="chip" id="edgeBtn" type="button">Kirjoita selaimessa</button>
+      </div>
+      <p class="muted" id="edgeStatus">
+        Pieni kielimalli ajetaan tässä selaimessa omalla näytönohjaimellasi. Se ei näe yhtään lukua:
+        se kirjoittaa paikkamerkkejä, ja portti hyväksyy tai hylkää jokaisen lauseen.
+      </p>
+      <div id="edgeOut"></div>
+    </section>
+
     <main class="grid">
       <section class="col-list">
         <div class="col-head">
@@ -74,5 +86,6 @@
     <footer class="ledger" id="ledger"></footer>
 
     <script src="/app.js"></script>
+    <script type="module" src="/edge.js"></script>
   </body>
 </html>
