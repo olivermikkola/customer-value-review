@@ -16,9 +16,17 @@ import { formatClaim, render, validateNarrative, type Ctx, type NarrativeResult,
 export const LLM_URL = process.env.LLM_URL ?? "http://localhost:13305/api/v1";
 export const LLM_MODEL = process.env.LLM_MODEL ?? "Gemma-3-4b-it-GGUF";
 
-const DIRECTION: Record<string, string> = { up: "nousi", down: "laski", flat: "pysyi ennallaan" };
+export const DIRECTION: Record<string, string> = { up: "nousi", down: "laski", flat: "pysyi ennallaan" };
+const DIRECTION_PLURAL: Record<string, string> = { up: "nousivat", down: "laskivat", flat: "pysyivät ennallaan" };
 
-const SYSTEM = [
+/** The verb for a claim's label, in agreement: "päästöt nousivat", "laskutus nousi". */
+export function verbFor(c: Claim): string {
+  if (c.kind !== "change") return "oli";
+  const plural = /[aeiouyäö]t$/i.test(c.label.trim());
+  return (plural ? DIRECTION_PLURAL : DIRECTION)[c.stated.direction] ?? "muuttui";
+}
+
+export const SYSTEM = [
   "You write one or two sentences of a customer review for a Finnish workwear and laundry service.",
   "Write in correct, plain Finnish. Output only the sentences, one per line.",
   "HARD RULES:",
@@ -49,7 +57,7 @@ export function tasksFor(claims: Claim[], drivers: Driver[], lens: Lens): Senten
   const byId = new Map(claims.map((c) => [c.id, c]));
   return buildObservations(claims, drivers, 3, lens).map((o) => {
     const c = byId.get(o.claimId)!;
-    const verb = c.kind === "change" ? (DIRECTION[c.stated.direction] ?? "muuttui") : "oli";
+    const verb = verbFor(c);
     const claimIds = [c.id];
     const lines = [`Fakta: ${c.label} ${verb} ${formatClaim(c)}.`];
     const mine = drivers.filter((x) => o.driverIds.includes(x.id));
@@ -104,7 +112,12 @@ export function slotify(text: string, ctx: Ctx, claimIds: string[], driverIds: s
   let out = text.replace(/[\u00a0\u202f]/g, " ");
   for (const id of driverIds) {
     const d = ctx.drivers.find((x) => x.id === id);
-    if (d) out = out.replace(new RegExp(escape(d.label), "gi"), `{{${d.id}}}`);
+    if (!d) continue;
+    // Models shorten names: "… krt/vko (Espoo, Vantaa)" often comes back without the brackets.
+    const short = [d.label, d.label.split(" (")[0]!, d.label.split(", ")[0]!].filter((x) => /\d/.test(x) || x === d.label);
+    for (const name of [...new Set(short)].sort((a, b) => b.length - a.length)) {
+      out = out.replace(new RegExp(escape(name), "gi"), `{{${d.id}}}`);
+    }
   }
   for (const id of claimIds) {
     const c = ctx.claims.get(id);
@@ -175,7 +188,9 @@ export function gate(
           ...result.rejected.map((r) => `- "${render(r.sentence, ctx).text}" → ${r.code}${r.detail ? ` (${r.detail})` : ""}`),
           "Kirjoita vain korjatut lauseet uudelleen, yksi per rivi. Noudata sääntöjä.",
         ].join("\n");
-  return { ...result, kept, feedback };
+  // Rejections carry the rendered text too, so a UI never shows raw slots.
+  const rejected = result.rejected.map((r) => ({ ...r, shown: render(r.sentence, ctx).text }));
+  return { ...result, rejected, kept, feedback };
 }
 
 export interface Draft {
