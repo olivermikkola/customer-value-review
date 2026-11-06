@@ -5,6 +5,8 @@ import { buildUiData } from "./export.ts";
 import { assemble } from "./assemble.ts";
 import { gate, tasksFor } from "./llm.ts";
 import { askTask } from "./ask.ts";
+import { TOPICS } from "./topics.ts";
+import { DEFAULT_EMBEDDER, EMBEDDERS } from "./embedders.ts";
 import type { Lens } from "./review.ts";
 
 const WEB = join(import.meta.dirname, "..", "web");
@@ -38,11 +40,30 @@ const server = createServer((req, res) => {
     return;
   }
 
+  // What the browser's embedding model compares questions against.
+  if (url.pathname === "/topics") {
+    res.writeHead(200, { "content-type": MIME[".json"]! });
+    res.end(JSON.stringify({ embedder: EMBEDDERS[DEFAULT_EMBEDDER], topics: TOPICS }));
+    return;
+  }
+
   if (url.pathname === "/ask") {
     const { claims, drivers } = assemble();
     const q = (url.searchParams.get("q") ?? "").slice(0, 300);
+    // Optional: similarity per topic id from the browser's embedding model. Numbers only; anything else is ignored.
+    let sims: Record<string, number> | undefined;
+    try {
+      const raw = JSON.parse(url.searchParams.get("sims") ?? "null") as Record<string, unknown> | null;
+      if (raw && typeof raw === "object") {
+        sims = Object.fromEntries(
+          Object.entries(raw).filter((e): e is [string, number] => typeof e[1] === "number" && Number.isFinite(e[1])),
+        );
+      }
+    } catch {
+      sims = undefined;
+    }
     res.writeHead(200, { "content-type": MIME[".json"]! });
-    res.end(JSON.stringify(askTask(q, claims, drivers)));
+    res.end(JSON.stringify(askTask(q, claims, drivers, sims)));
     return;
   }
 

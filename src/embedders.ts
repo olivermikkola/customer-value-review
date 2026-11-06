@@ -1,0 +1,50 @@
+/**
+ * Small multilingual embedding models that run in the browser (transformers.js,
+ * ONNX). Measured with scripts/ask-eval.ts on 40 questions another model
+ * wrote without seeing the word lists (right fact first / right fact anywhere
+ * in the answer): word lists alone 27 / 33, + e5-small 29 / 33,
+ * + EmbeddingGemma 30 / 35. EmbeddingGemma is the default.
+ */
+export const DEFAULT_EMBEDDER = "embeddinggemma";
+export interface EmbedderSpec {
+  repo: string;
+  dtype: string;
+  /** ONNX file stem when not "model"; the browser's CPU runtime lacks the op in EmbeddingGemma's default q4 file. */
+  file?: string;
+  /** Approximate download, for the UI. */
+  mb: number;
+  query: string;
+  doc: string;
+}
+
+export const EMBEDDERS: Record<string, EmbedderSpec> = {
+  "e5-small": {
+    repo: "Xenova/multilingual-e5-small",
+    dtype: "q8",
+    mb: 118,
+    query: "query: ",
+    doc: "passage: ",
+  },
+  "embeddinggemma": {
+    repo: "onnx-community/embeddinggemma-300m-ONNX",
+    dtype: "q4",
+    file: "model_no_gather",
+    mb: 195,
+    query: "task: search result | query: ",
+    doc: "title: none | text: ",
+  },
+};
+
+type Extractor = (texts: string[], opts: { pooling: "mean"; normalize: boolean }) => Promise<{ tolist(): number[][] }>;
+
+/** Unit vectors, so a dot product is the cosine similarity. */
+export async function embedText(
+  extract: unknown,
+  spec: EmbedderSpec,
+  texts: string[],
+  kind: "query" | "doc",
+): Promise<number[][]> {
+  const prefix = kind === "query" ? spec.query : spec.doc;
+  const out = await (extract as Extractor)(texts.map((t) => prefix + t), { pooling: "mean", normalize: true });
+  return out.tolist();
+}

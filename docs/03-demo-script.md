@@ -223,7 +223,7 @@ Kolmas on tärkeä: katsaus joka löytää vain ongelmia tuntuu auditoinnilta.
 
 ## Tekoäly selaimessa: kysy katsaukselta (60–90 s)
 
-Malli (Ternary Bonsai 2 4B) latautuu taustalle kun sivu aukeaa. Avatkaa sivu
+Mallit (Ternary Bonsai 2 4B ~0,95 Gt + EmbeddingGemma ~0,2 Gt) latautuvat taustalle kun sivu aukeaa. Avatkaa sivu
 **ennen** demoa samalla koneella, niin malli on välimuistissa (~4 s käynnistys).
 Tarvitsee WebGPU-selaimen (Chrome/Edge, Safari 26).
 
@@ -236,7 +236,10 @@ Kysykää tässä järjestyksessä, kirjoittamalla kenttään:
    **Tämä on demon huippuhetki.**
 3. **"Ollaanko me parempia kuin muut?"** → "ei todennettua dataa, vaatii vertaisdatan".
    *"Rehellinen ei on arvokkaampi kuin kaunis arvaus."*
-4. Klikatkaa **"todiste →"** vastauksessa → sama luku aukeaa kaavaan ja raakatapahtumiin.
+4. *(valinnainen)* **"Miten vedenkulutus käyttäytyi joulukuussa?"** → Q4-luku tulee ensin.
+   *"Sanat löytävät ehdokkaat, toinen pieni malli ymmärtää merkityksen ja valitsee niistä.
+   Se ei koskaan päätä, vastataanko — siksi kohdan 3 kysymys saa edelleen rehellisen 'ei dataa'."*
+5. Klikatkaa **"todiste →"** vastauksessa → sama luku aukeaa kaavaan ja raakatapahtumiin.
 
 Lause jonka sanotte: *"Malli ajetaan asiakkaan omassa selaimessa — data ei lähde
 tekoälyyhtiölle, eikä per-katsaus AI-kulua synny. Ja koska koodi laskee ja portti

@@ -19,6 +19,7 @@
     "node": ">=22.18"
   },
   "devDependencies": {
+    "@huggingface/transformers": "^4.3.2",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.10.2",
     "esbuild": "^0.28.2",

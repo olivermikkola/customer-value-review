@@ -22,6 +22,8 @@ await page.waitForFunction(() => window.__edgeWrite && window.__lankaLens);
 
 if (asking) {
   const runs = [];
+  // Let the embedding model finish loading first, as it would while a person reads the page.
+  await page.evaluate(() => import("/semantic.js").then((m) => m.loadSemantic()));
   for (const [i, q] of questions.entries()) {
     runs.push(await page.evaluate((x) => window.__edgeAnswer(x), q));
     await page.locator(".askbar").screenshot({ path: `/tmp/lanka-ask-${i + 1}.png` });

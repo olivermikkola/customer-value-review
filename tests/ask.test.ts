@@ -64,3 +64,38 @@ test("a cause the data does not hold is stopped (the live demo moment)", () => {
   const g = gate("Palvelulaskutus nousi 10,1 %, koska palvelun laatu parani.", ctx, [], r.task);
   assert.equal(g.rejected[0]?.code, "UNSUPPORTED_CAUSAL");
 });
+
+// Semantic routing (src/ask.ts + web/semantic.js): fake similarities, real rules.
+const near = (id: string) => Object.fromEntries(
+  ["clm:water-intensity-up", "clm:water-volume-up", "clm:linen-up", "clm:mat-up", "clm:cost-up", "clm:loss-cost-up",
+    "clm:repair-rate-up", "clm:co2-up", "clm:water-avoided", "clm:water-q4"].map((x) => [x, x === id ? 0.9 : 0.5]),
+);
+
+test("meaning orders the topics the words found", () => {
+  const m = matchQuestion("Miten vedenkulutus käyttäytyi joulukuussa?", a.claims, a.drivers, near("clm:water-q4"));
+  assert.equal(m.claimIds[0], "clm:water-q4");
+  assert.ok(m.claimIds.includes("clm:water-volume-up"));
+});
+
+test("meaning never brings in a topic the question did not mention", () => {
+  // Measured in the browser: the embedder ranked Q4 water closest to a question about the bill.
+  const m = matchQuestion("Miksi laskumme nousi?", a.claims, a.drivers, near("clm:water-q4"));
+  assert.deepEqual(m.claimIds, ["clm:cost-up"]);
+});
+
+test("an off-topic question stays unanswered however close the embedding says it is", () => {
+  const r = askTask("Mikä on toimitusvarmuus?", a.claims, a.drivers, near("clm:loss-cost-up"));
+  assert.equal(r.task, null);
+});
+
+test("a named cause beats the embedding: Tapiola means the Tapiola losses", () => {
+  const m = matchQuestion("Mitä Tapiolassa tapahtui?", a.claims, a.drivers, near("clm:water-volume-up"));
+  assert.deepEqual(m.claimIds, ["clm:loss-cost-up"]);
+});
+
+test("without similarities the word lists decide alone (embedder not loaded yet)", () => {
+  assert.deepEqual(
+    matchQuestion("Miksi laskumme nousi?", a.claims, a.drivers).claimIds,
+    matchQuestion("Miksi laskumme nousi?", a.claims, a.drivers, undefined).claimIds,
+  );
+});

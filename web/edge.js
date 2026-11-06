@@ -5,6 +5,7 @@
    sentence the gate did not accept. */
 
 import { Bonsai } from "/vendor/bonsai.js";
+import { loadSemantic, similarities } from "/semantic.js";
 
 const HF = "https://huggingface.co/prism-ml";
 export const MODELS = {
@@ -210,12 +211,15 @@ export function answer(question) {
     host.className = "answer";
     host.replaceChildren(Object.assign(document.createElement("p"), { className: "muted", textContent: "Haetaan todennettuja lukuja…" }));
     const t0 = performance.now();
-    const res = await fetch(`/ask?q=${encodeURIComponent(question)}`).then((r) => r.json());
+    // Meaning picks which fact comes first, if the embedding model is ready; never wait long for it.
+    const sims = await Promise.race([similarities(question), new Promise((r) => setTimeout(() => r(null), 4000))]);
+    const simsParam = sims ? `&sims=${encodeURIComponent(JSON.stringify(sims))}` : "";
+    const res = await fetch(`/ask?q=${encodeURIComponent(question)}${simsParam}`).then((r) => r.json());
 
     if (!res.task) {
       host.className = "answer bad";
       host.replaceChildren(Object.assign(document.createElement("p"), { textContent: res.reason }));
-      return { question, sentences: [], rejected: [], noData: res.reason, s: +((performance.now() - t0) / 1000).toFixed(1) };
+      return { question, routing: sims ? "semantic" : "words", sentences: [], rejected: [], noData: res.reason, s: +((performance.now() - t0) / 1000).toFixed(1) };
     }
 
     host.replaceChildren(
@@ -244,7 +248,14 @@ export function answer(question) {
     });
     host.className = "answer ok";
     host.replaceChildren(ul, ...(r.rejected.length ? [rejectedList(r.rejected)] : []));
-    return { question, sentences, rejected: r.rejected.map((x) => ({ code: x.code, sentence: x.shown ?? x.sentence })), s };
+    return {
+      question,
+      routing: sims ? "semantic" : "words",
+      matched: res.matched,
+      sentences,
+      rejected: r.rejected.map((x) => ({ code: x.code, sentence: x.shown ?? x.sentence })),
+      s,
+    };
   });
 }
 
@@ -260,6 +271,9 @@ $("askForm").addEventListener("submit", (e) => {
 
 // Start the download while the reader looks at the page; it is cached after the first visit.
 if (navigator.gpu && params.get("preload") !== "0") {
-  const start = () => load().catch((err) => status(`Mallin lataus epäonnistui: ${err.message ?? err}`));
+  const start = () => {
+    load().catch((err) => status(`Mallin lataus epäonnistui: ${err.message ?? err}`));
+    loadSemantic();
+  };
   (window.requestIdleCallback ?? ((f) => setTimeout(f, 500)))(start);
 }

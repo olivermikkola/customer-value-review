@@ -173,8 +173,10 @@ export function validateSentence(text: string, ctx: Ctx): Verdict {
 
   // V1 — a digit outside a slot is an unsourced number.
   const bare = text.replace(CLAIM_SLOT, "").replace(DRIVER_SLOT, "");
-  if (/\d/.test(bare)) {
-    const found = bare.match(/\d+([.,]\d+)?/g)?.join(", ") ?? "";
+  // A quarter's name ("Q4") is a label, not a quantity; every other digit must come from a slot.
+  const digits = bare.replace(/\bQ[1-4]\b/g, "Q");
+  if (/\d/.test(digits)) {
+    const found = digits.match(/\d+([.,]\d+)?/g)?.join(", ") ?? "";
     return {
       ok: false,
       code: "UNSOURCED_NUMBER",
