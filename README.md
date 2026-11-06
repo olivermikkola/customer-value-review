@@ -84,6 +84,27 @@ Viisi asiaa jotka koodi todistaa eikä väitä:
 5. **Sitoumus mitataan, ei oleteta.** Q4:n toteuma −9,2 % ylittää −8 %:n tavoitteen;
    `progress()` laskee sen mittareista, ei ehdotuksen lupauksesta.
 
+## Kielimalli selaimessa (edge AI)
+
+Katsauksen tekstin voi kirjoittaa pieni kielimalli **käyttäjän omassa selaimessa**
+(WebGPU): Prism ML:n Ternary Bonsai 2 4B, n. 0,95 Gt, ladataan kerran Hugging Facesta
+ja välimuistitetaan. Moottori on `web/vendor/bonsai.js` (PrismML-Eng/Talk `kernels.ts`,
+Apache-2.0, ks. `web/vendor/BONSAI-*`).
+
+Malli ei laske eikä näe raakadataa. Se saa yhden havainnon kerrallaan valmiine
+lukuineen ja saa vain kopioida ne. `slotify` sitoo jokaisen kopioidun luvun takaisin
+väitteeseensä; luku joka ei täsmää on `UNSOURCED_NUMBER`. Jokainen lause menee saman
+portin läpi kuin käsin kirjoitettu. Jos malli epäonnistuu kahdesti, lause tulee
+pohjasta, ja UI merkitsee kumpi kirjoitti (AI / pohja).
+
+```bash
+npm run ui                                  # nappi "Kirjoita selaimessa"
+node scripts/edge-run.mjs balanced 4B       # sama headless-Chromessa, tulostaa tuloksen
+npm run write                               # sama silmukka palvelimella (OpenAI-yhteensopiva, LLM_URL/LLM_MODEL)
+```
+
+Moottorin päivitys: `npx esbuild <Talk>/kernels.ts --bundle --format=esm --minify --outfile=web/vendor/bonsai.js`.
+
 ## Linssit
 
 Sama data, sama totuus, eri järjestys. Tämä ratkaisi rehellisyysongelman: kustannus

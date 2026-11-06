@@ -24,7 +24,10 @@ export type Code =
   | "UNSUPPORTED_CAUSAL"
   | "UNSUPPORTED_SUPERLATIVE"
   | "ROUNDING_DISTORTS"
-  | "UNKNOWN_SLOT";
+  | "UNKNOWN_SLOT"
+  | "SUBJECT_MISMATCH"
+  | "DUPLICATE_SLOT"
+  | "NO_CLAIM";
 
 export interface Verdict {
   ok: boolean;
@@ -49,8 +52,31 @@ function parseSlot(payload: string): { id: string; decimals?: number } {
   return { id: payload };
 }
 
+// Stems, not words: Finnish inflects ("aiheuttivat", "johtuen", "selittyy").
 const CAUSAL_RE =
-  /\b(koska|johtuu|johtui|aiheutti|selittää|selitti|sen vuoksi|tästä syystä|seurauksena)\b/i;
+  /\b(koska|johtu\p{L}*|aiheutt\p{L}*|selittä\p{L}*|selitti|selitty\p{L}*|sen vuoksi|tästä syystä|seurauksena|vuoksi|takia|ansiosta|liitty\p{L}*)/iu;
+
+/**
+ * V10 — a number must sit next to what it measures. A slot is only accepted
+ * when its sentence names the claim's subject (any of these stems). This is
+ * what stops a small model from sprinkling a correct value into the wrong
+ * sentence, which every other rule would let through.
+ */
+const SUBJECT_STEMS: Record<string, string[]> = {
+  "clm:water-intensity-up": ["ominaiskulutu"],
+  "clm:water-volume-up": ["kokonaiskulutu", "vedenkulutu"],
+  "clm:linen-up": ["pyykki", "pyykin", "pyykkiä"],
+  "clm:mat-up": ["matto", "mattoj"],
+  "clm:cost-up": ["laskutu"],
+  "clm:loss-cost-up": ["katoami", "hävikk"],
+  "clm:repair-rate-up": ["korjau"],
+  "clm:co2-up": ["päästö"],
+  "clm:water-avoided": ["vältet", "säästet", "säästy"],
+  "clm:water-attribution": ["matto", "selitty", "selittä"],
+  "clm:water-unattributed": ["selittämät", "loput", "loppu"],
+  "clm:water-q4": ["q4", "neljän"],
+  "clm:intensity-counterfactual": ["ilman"],
+};
 const SUPERLATIVE_RE =
   /\b(paras|parhain|parhaita|merkittävästi|selvästi parempi|huippu|ennätys)\b/i;
 
@@ -159,6 +185,8 @@ export function validateSentence(text: string, ctx: Ctx): Verdict {
 
   const claims = claimIds.map((id) => ctx.claims.get(id)!);
 
+
+
   for (const claim of claims) {
     // V2 — chain must reach measures that reach sources/factors.
     if (claim.measureIds.length === 0) {
@@ -233,9 +261,11 @@ export function validateSentence(text: string, ctx: Ctx): Verdict {
 
   // V7 — causal language needs a Driver edge on one of the claims.
   if (CAUSAL_RE.test(text)) {
-    const supported = claims.some((c) =>
-      ctx.drivers.some((d) => d.claimId === c.id || d.evidenceClaimIds.includes(c.id)),
-    );
+    // Supported by a claim that has a Driver edge, or by naming a Driver that is not a hypothesis.
+    const named = [...text.matchAll(DRIVER_SLOT)].map((m) => ctx.drivers.find((d) => d.id === m[1]));
+    const supported =
+      claims.some((c) => ctx.drivers.some((d) => d.claimId === c.id || d.evidenceClaimIds.includes(c.id))) ||
+      named.some((d) => d && d.method !== "hypothesis");
     if (!supported) {
       return {
         ok: false,
@@ -254,6 +284,19 @@ export function validateSentence(text: string, ctx: Ctx): Verdict {
     }
   }
 
+  // V10 last, so older rules keep reporting their own reason first.
+  const lower = bare.toLowerCase();
+  for (const id of claimIds) {
+    const stems = SUBJECT_STEMS[id];
+    if (stems && !stems.some((st) => lower.includes(st))) {
+      return {
+        ok: false,
+        code: "SUBJECT_MISMATCH",
+        sentence: text,
+        detail: `${id} vaatii lauseeseen jonkin: ${stems.join(" / ")}`,
+      };
+    }
+  }
   return { ok: true, sentence: text };
 }
 
@@ -265,10 +308,27 @@ export interface NarrativeResult {
 export function validateNarrative(sentences: string[], ctx: Ctx): NarrativeResult {
   const accepted: { text: string; claimIds: string[] }[] = [];
   const rejected: Verdict[] = [];
+  const used = new Set<string>();
   for (const s of sentences) {
     const v = validateSentence(s, ctx);
-    if (v.ok) accepted.push(render(s, ctx));
-    else rejected.push(v);
+    if (!v.ok) {
+      rejected.push(v);
+      continue;
+    }
+    // A value quoted twice is decoration, not evidence.
+    const r = render(s, ctx);
+    // A review sentence carries a claim or names a recorded cause; anything else is filler the reader cannot check.
+    if (r.claimIds.length === 0 && !/\{\{drv:/.test(s)) {
+      rejected.push({ ok: false, code: "NO_CLAIM", sentence: s });
+      continue;
+    }
+    const again = r.claimIds.find((id) => used.has(id));
+    if (again) {
+      rejected.push({ ok: false, code: "DUPLICATE_SLOT", sentence: s, detail: again });
+      continue;
+    }
+    r.claimIds.forEach((id) => used.add(id));
+    accepted.push(r);
   }
   return { accepted, rejected };
 }

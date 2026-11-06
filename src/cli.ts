@@ -4,6 +4,7 @@ import { assemble, measureById } from "./assemble.ts";
 import type { Claim, Driver, Measure } from "./model.ts";
 import { buildObservations, type Lens } from "./review.ts";
 import { OPENING, SAMPLE_NARRATIVE, SAMPLE_REJECTIONS } from "./narrative.ts";
+import { draftNarrative } from "./llm.ts";
 import { render, validateNarrative, validateSentence } from "./validator.ts";
 import { round } from "./util.ts";
 import { generate } from "./seed/generate.ts";
@@ -176,6 +177,20 @@ function cmdReview(): void {
   }
 }
 
+async function cmdWrite(): Promise<void> {
+  const { idx, claims, drivers } = assemble();
+  const lens = (process.argv[3] ?? "balanced") as Lens;
+  const ctx = { claims: new Map(claims.map((c) => [c.id, c])), measures: idx.measures, drivers };
+  const d = await draftNarrative(claims, drivers, lens, ctx);
+  console.log(`${d.model} · ${(d.ms / 1000).toFixed(1)} s [linssi: ${lens}]`);
+  console.log("");
+  console.log("--- Katsaus (malli = kielimallin kirjoittama, pohja = mallipohja) ---");
+  for (const line of d.sentences) console.log(`  ✓ [${line.by === "model" ? "malli" : "pohja"}] ${line.text}`);
+  console.log("");
+  console.log("--- Portti pysäytti ---");
+  for (const r of d.rejected) console.log(`  ✗ [${r.code}] ${r.sentence}${r.detail ? `\n     ${r.detail}` : ""}`);
+}
+
 function cmdVerify(): void {
   const { measures, claims, drivers, observations } = assemble();
   console.log(`✓ ${measures.length} mittaria laskettu ja tarkistettu uudelleen`);
@@ -196,10 +211,13 @@ switch (command) {
   case "review":
     cmdReview();
     break;
+  case "write":
+    await cmdWrite();
+    break;
   case "verify":
     cmdVerify();
     break;
   default:
-    console.log("käyttö: node src/cli.ts <seed|facts|review|verify>");
+    console.log("käyttö: node src/cli.ts <seed|facts|review|write|verify>");
     process.exitCode = 1;
 }

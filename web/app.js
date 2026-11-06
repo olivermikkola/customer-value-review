@@ -2,6 +2,11 @@
 
 const state = { data: null, lens: "sustainability", selected: null, accepted: false, jumped: false };
 
+const HERO_KEY = "lanka.hero.hidden";
+
+/** edge.js writes the review for whichever lens is open. */
+window.__lankaLens = () => state.lens;
+
 const el = (tag, attrs = {}, ...children) => {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -25,6 +30,22 @@ const obs = () => state.data.observations[state.lens];
 const current = () => obs().find((o) => o.id === state.selected) ?? obs()[0];
 
 const SEVERITY = { act: "TOIMI", watch: "SEURAA", info: "TIEDOKSI" };
+const CONFIDENCE = {
+  measured: "mitattu",
+  estimated: "arvioitu",
+  modeled: "mallinnettu",
+  proxy: "proxy",
+  unknown: "tuntematon",
+};
+
+const conf = (c) => CONFIDENCE[c] ?? c;
+
+/** A change claim gets an explicit + so the direction is never ambiguous. */
+function claimText(o) {
+  const v = Number(String(o.claim.value).replace(",", "."));
+  const signed = (o.claim.kind === "change" || o.claim.kind === "delta") && v > 0;
+  return `${signed ? "+" : ""}${o.claim.display}`;
+}
 
 init();
 
@@ -34,9 +55,76 @@ async function init() {
   state.selected = data.observations[state.lens][0].id;
   document.getElementById("customer").textContent = `${data.customer} · ${data.period}`;
   document.getElementById("period").textContent = `vs. ${data.comparePeriod}`;
+  renderHero();
   renderLens();
   renderChips();
   renderAll();
+}
+
+/* ---------------- intro ---------------- */
+
+function renderHero() {
+  const d = state.data;
+
+  document.getElementById("scope").textContent =
+    `${d.scope.sites} toimipistettä · ${d.scope.periods} kvartaalia · ` +
+    `${d.scope.from}–${d.scope.to}`;
+
+  document.getElementById("counts").textContent =
+    `${d.counts.sources} raakatapahtumaa · ${d.counts.factors} kerrointa · ` +
+    `${d.counts.measures} laskettua mittaria · ${d.counts.claims} väitettä`;
+
+  document.getElementById("takeaways").replaceChildren(
+    ...d.takeaways.map((t, i) =>
+      el(
+        "li",
+        {},
+        el(
+          "button",
+          { class: "takeaway", onclick: () => openClaim(t.claimId) },
+          el("span", { class: "takeaway-n" }, `${i + 1}`),
+          el("span", {}, t.text),
+        ),
+      ),
+    ),
+  );
+
+  let hidden = false;
+  try {
+    hidden = localStorage.getItem(HERO_KEY) === "1";
+  } catch {
+    /* opaque origin (tests, private mode) */
+  }
+  setHeroHidden(hidden);
+
+  document.getElementById("introBtn").addEventListener("click", () => {
+    setHeroHidden(!document.getElementById("hero").classList.contains("is-hidden"));
+  });
+}
+
+function setHeroHidden(hidden) {
+  document.getElementById("hero").classList.toggle("is-hidden", hidden);
+  document.getElementById("introBtn").textContent = hidden ? "Mikä tämä on?" : "Piilota johdanto";
+  try {
+    localStorage.setItem(HERO_KEY, hidden ? "1" : "0");
+  } catch {
+    /* private mode: fine */
+  }
+}
+
+/** Jump from a takeaway to the observation that proves it. */
+function openClaim(claimId) {
+  const lens = state.data.lenses.find((l) =>
+    state.data.observations[l.id].some((o) => o.claimId === claimId),
+  );
+  if (lens) state.lens = lens.id;
+  const target = obs().find((o) => o.claimId === claimId);
+  if (!target) return;
+  state.selected = target.id;
+  setHeroHidden(true);
+  renderLens();
+  renderAll();
+  document.getElementById("detail").scrollIntoView?.({ behavior: "smooth", block: "start" });
 }
 
 function renderLens() {
@@ -108,23 +196,24 @@ function renderList() {
           "div",
           { class: "card-top" },
           el("span", { class: "sev" }, SEVERITY[o.severity] ?? ""),
-          el("span", { class: "ranknum" }, `${i + 1}/${obs().length} · ${num(o.rank, 2)}`),
+          el(
+            "span",
+            { class: "ranknum", title: `painotettu sijoitus ${num(o.rank, 2)}` },
+            `${i + 1}/${obs().length}`,
+          ),
         ),
         el("h3", {}, o.headline),
         el(
           "div",
           { class: "value" },
-          formatDelta(o),
-          el("small", {}, o.claim.confidence === "measured" ? "mitattu" : o.claim.confidence),
+          claimText(o),
+          el("small", {}, conf(o.claim.confidence)),
         ),
+        o.meaning ? el("p", { class: "card-meaning" }, o.meaning) : null,
         el("div", { class: "rankbar" }, el("i", { style: `width:${(o.rank / max) * 100}%` })),
       ),
     ),
   );
-}
-
-function formatDelta(o) {
-  return o.claim.display;
 }
 
 /* ---------------- detail ---------------- */
@@ -140,7 +229,7 @@ function renderDetail() {
       { class: "detail-head" },
       el("div", { class: "eyebrow" }, `HAVAINTO ${index} / ${obs().length} · ${SEVERITY[o.severity]}`),
       el("h1", {}, o.headline),
-      el("div", { class: "big" }, o.claim.display),
+      el("div", { class: "big" }, claimText(o)),
       el(
         "div",
         { class: "meta" },
@@ -148,10 +237,11 @@ function renderDetail() {
           ? "taso tällä jaksolla"
           : `verrattuna ${o.claim.comparedTo ?? state.data.comparePeriod}`,
         " · luottamus ",
-        el("span", { class: `badge ${o.claim.confidence}` }, o.claim.confidence),
+        el("span", { class: `badge ${o.claim.confidence}` }, conf(o.claim.confidence)),
       ),
       o.check ? el("div", { class: "checkline" }, o.check) : null,
     ),
+    o.meaning ? el("p", { class: "meaning" }, o.meaning) : null,
     o.measures.length ? chainBlock(o) : null,
     driverBlock(o),
     optionsBlock(o),
@@ -332,7 +422,27 @@ function renderLedger() {
         "div",
         { class: "ledger-inner" },
         el("span", { class: "ledger-label" }, "Sitoumukset"),
-        el("span", { class: "ledger-empty" }, "Ei avoimia sitoumuksia. Havainto ei ole vielä teko."),
+        el(
+          "span",
+          { class: "ledger-empty" },
+          "Ei avoimia sitoumuksia. Havainto ei ole vielä teko — valitse ehdotus B.",
+        ),
+        el(
+          "button",
+          {
+            class: "linkbtn",
+            type: "button",
+            onclick: () => {
+              openClaim("clm:water-intensity-up");
+              requestAnimationFrame(() =>
+                document
+                  .querySelector(".option.recommended")
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" }),
+              );
+            },
+          },
+          "Näytä ehdotus B →",
+        ),
       ),
     );
     return;

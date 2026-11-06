@@ -33,6 +33,32 @@ async function boot() {
   };
 }
 
+test("the first screen explains what this is and what was found", async () => {
+  const { text, all } = await boot();
+  assert.match(text("#heroTitle"), /Mitä arvoa me oikeasti loimme/);
+  assert.match(text("#scope"), /6 toimipistettä/);
+  assert.match(text("#counts"), /243 raakatapahtumaa/);
+  assert.match(text("#counts"), /94 laskettua mittaria/);
+  assert.equal(all(".takeaway").length, 3);
+  assert.match(all(".takeaway")[0]?.textContent ?? "", /Veden ominaiskulutus: 14,0 %/);
+  assert.match(all(".takeaway")[1]?.textContent ?? "", /53,4 %/);
+});
+
+test("every card carries a plain-language meaning, not just a number", async () => {
+  const { all } = await boot();
+  for (const card of all(".card")) {
+    assert.ok(card.querySelector(".card-meaning"), `missing meaning: ${card.textContent}`);
+  }
+  assert.match(all(".card")[0]?.querySelector(".card-meaning")?.textContent ?? "", /tehokkuusongelma/);
+});
+
+test("clicking a takeaway opens the observation that proves it", async () => {
+  const { all, text } = await boot();
+  all(".takeaway")[2]?.click();
+  await new Promise((r) => setTimeout(r, 20));
+  assert.match(text("#detail"), /Katoamisen kustannus/);
+});
+
 test("the app boots and renders three observation cards", async () => {
   const { q, all } = await boot();
   assert.equal(all(".card").length, 3);
