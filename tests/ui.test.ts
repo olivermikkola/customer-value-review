@@ -114,7 +114,7 @@ test("accepting creates a commitment, and the jump measures it", async () => {
 
 test("the ask bar answers, and shows the rejection code when the gate fires", async () => {
   const { q, all, text } = await boot();
-  const chips = all(".chip");
+  const chips = all("#chips .chip");
 
   must(chips[0] ?? null, "first chip").click();
   await new Promise((r) => setTimeout(r, 10));

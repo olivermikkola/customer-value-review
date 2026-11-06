@@ -4,6 +4,7 @@ import { extname, join } from "node:path";
 import { buildUiData } from "./export.ts";
 import { assemble } from "./assemble.ts";
 import { gate, tasksFor } from "./llm.ts";
+import { askTask } from "./ask.ts";
 import type { Lens } from "./review.ts";
 
 const WEB = join(import.meta.dirname, "..", "web");
@@ -34,6 +35,14 @@ const server = createServer((req, res) => {
     const lens = (url.searchParams.get("lens") ?? "balanced") as Lens;
     res.writeHead(200, { "content-type": MIME[".json"]! });
     res.end(JSON.stringify(tasksFor(claims, drivers, lens)));
+    return;
+  }
+
+  if (url.pathname === "/ask") {
+    const { claims, drivers } = assemble();
+    const q = (url.searchParams.get("q") ?? "").slice(0, 300);
+    res.writeHead(200, { "content-type": MIME[".json"]! });
+    res.end(JSON.stringify(askTask(q, claims, drivers)));
     return;
   }
 

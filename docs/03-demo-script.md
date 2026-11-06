@@ -220,3 +220,26 @@ ja se on koko pitchin teesi.
    sille että kaikki havainnot olisivat ongelmia
 
 Kolmas on tärkeä: katsaus joka löytää vain ongelmia tuntuu auditoinnilta.
+
+## Tekoäly selaimessa: kysy katsaukselta (60–90 s)
+
+Malli (Ternary Bonsai 2 4B) latautuu taustalle kun sivu aukeaa. Avatkaa sivu
+**ennen** demoa samalla koneella, niin malli on välimuistissa (~4 s käynnistys).
+Tarvitsee WebGPU-selaimen (Chrome/Edge, Safari 26).
+
+Kysykää tässä järjestyksessä, kirjoittamalla kenttään:
+
+1. **"Miksi vedenkulutus nousi?"** → luku + todettu syy (mattotiheys) + selittämätön
+   osa "ajoittuu samaan aikaan, syytä ei vahvistettu". *"Se ei arvaa syytä, jota data ei tiedä."*
+2. **"Miksi laskumme nousi?"** → malli keksii syyn ("johtuu palvelun laatuun"),
+   ja portti pysäyttää sen. Avatkaa "Portti pysäytti" ja näyttäkää `UNSUPPORTED_CAUSAL`.
+   **Tämä on demon huippuhetki.**
+3. **"Ollaanko me parempia kuin muut?"** → "ei todennettua dataa, vaatii vertaisdatan".
+   *"Rehellinen ei on arvokkaampi kuin kaunis arvaus."*
+4. Klikatkaa **"todiste →"** vastauksessa → sama luku aukeaa kaavaan ja raakatapahtumiin.
+
+Lause jonka sanotte: *"Malli ajetaan asiakkaan omassa selaimessa — data ei lähde
+tekoälyyhtiölle, eikä per-katsaus AI-kulua synny. Ja koska koodi laskee ja portti
+tarkistaa, pienikään malli ei voi valehdella asiakkaalle."*
+
+Jos WebGPU ei toimi: vastaus tulee pohjalauseista (merkitty "pohja"), demo ei kaadu.
