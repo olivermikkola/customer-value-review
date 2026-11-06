@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assemble } from "../src/assemble.ts";
-import { askTask, matchQuestion } from "../src/ask.ts";
+import { askTask, matchQuestion, moduleFor } from "../src/ask.ts";
 import { gate } from "../src/llm.ts";
 import type { Ctx } from "../src/validator.ts";
 
@@ -98,4 +98,26 @@ test("without similarities the word lists decide alone (embedder not loaded yet)
     matchQuestion("Miksi laskumme nousi?", a.claims, a.drivers).claimIds,
     matchQuestion("Miksi laskumme nousi?", a.claims, a.drivers, undefined).claimIds,
   );
+});
+
+// "No data" names Lindström's own add-on module when one would answer the question.
+
+test("questions this review cannot answer point to the module that would", () => {
+  const delivery = askTask("Toimitetaanko vaatteet ajallaan?", a.claims, a.drivers);
+  assert.equal(delivery.task, null);
+  assert.equal(delivery.task === null ? delivery.module?.name : "", "Transparency & control");
+  const compare = askTask("Ollaanko me parempia kuin muut?", a.claims, a.drivers);
+  assert.equal(compare.task === null ? compare.module?.name : "", "Performance reporting & benchmarking");
+  assert.equal(moduleFor("Paljonko vaatteita tarvitaan ensi kvartaalilla?")?.name, "Predictive & AI-assisted insights");
+  assert.equal(moduleFor("Saammeko ESG-raporttiin auditoitavan näytön?")?.name, "Sustainability & compliance intelligence");
+});
+
+test("no module is invented where none fits", () => {
+  const r = askTask("Kuka on meidän asiakasvastaavamme?", a.claims, a.drivers);
+  assert.equal(r.task, null);
+  assert.equal(r.task === null ? r.module : "x", undefined);
+});
+
+test("a question the review can answer is answered, not sold", () => {
+  assert.ok(askTask("Miksi laskumme nousi?", a.claims, a.drivers).task);
 });

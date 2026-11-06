@@ -15,7 +15,17 @@ let ready = null;
 /** Loads the model and embeds the topics once. Resolves to null if anything fails: the page then uses word lists only. */
 export function loadSemantic() {
   ready ??= (async () => {
-    const { embedder, topics } = await fetch("/topics").then((r) => r.json());
+    const [{ embedder, topics }, where] = await Promise.all([
+      fetch("/topics").then((r) => r.json()),
+      fetch("/local").then((r) => r.json()).catch(() => ({})),
+    ]);
+    // Local files from this server when present (npm run models): no Hugging Face, no CDN.
+    if (where.hf) {
+      env.allowLocalModels = true;
+      env.allowRemoteModels = false;
+      env.localModelPath = where.hf;
+    }
+    if (where.ort) env.backends.onnx.wasm.wasmPaths = where.ort;
     const extract = await pipeline("feature-extraction", embedder.repo, {
       dtype: embedder.dtype,
       device: "wasm",

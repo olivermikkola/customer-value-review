@@ -215,6 +215,35 @@ h3 {
   color: var(--muted);
 }
 
+.answer.info {
+  border-color: var(--line-strong);
+  background: rgba(255, 253, 248, 0.9);
+}
+
+.module-card {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.module-card p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.module-tag {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
 .proof-link {
   font-size: 12px;
 }

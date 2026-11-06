@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
-import { readFileSync } from "node:fs";
-import { extname, join } from "node:path";
+import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
+import { extname, join, normalize, sep } from "node:path";
 import { buildUiData } from "./export.ts";
 import { assemble } from "./assemble.ts";
 import { gate, tasksFor } from "./llm.ts";
@@ -8,8 +8,45 @@ import { askTask } from "./ask.ts";
 import { TOPICS } from "./topics.ts";
 import { DEFAULT_EMBEDDER, EMBEDDERS } from "./embedders.ts";
 import type { Lens } from "./review.ts";
+import { LOCAL, MODELS } from "./local.ts";
 
 const WEB = join(import.meta.dirname, "..", "web");
+
+/**
+ * Files under models/, with byte ranges: the Bonsai engine reads its weights
+ * in ranges, exactly as it does from Hugging Face.
+ */
+function serveModelFile(req: import("node:http").IncomingMessage, res: import("node:http").ServerResponse, rel: string) {
+  const path = normalize(join(MODELS, rel));
+  if (!path.startsWith(MODELS + sep) || !existsSync(path) || !statSync(path).isFile()) {
+    res.writeHead(404).end("not found");
+    return;
+  }
+  const size = statSync(path).size;
+  const type = MIME[extname(path)] ?? (path.endsWith(".wasm") ? "application/wasm" : "application/octet-stream");
+  const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range ?? "");
+  const head = req.method === "HEAD";
+  if (range && (range[1] || range[2])) {
+    const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]));
+    const end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+    if (start > end || start >= size) {
+      res.writeHead(416, { "content-range": `bytes */${size}` }).end();
+      return;
+    }
+    res.writeHead(206, {
+      "content-type": type,
+      "content-length": end - start + 1,
+      "content-range": `bytes ${start}-${end}/${size}`,
+      "accept-ranges": "bytes",
+    });
+    if (head) res.end();
+    else createReadStream(path, { start, end }).pipe(res);
+    return;
+  }
+  res.writeHead(200, { "content-type": type, "content-length": size, "accept-ranges": "bytes" });
+  if (head) res.end();
+  else createReadStream(path).pipe(res);
+}
 const PORT = Number(process.env.PORT ?? 5173);
 
 const MIME: Record<string, string> = {
@@ -18,6 +55,8 @@ const MIME: Record<string, string> = {
   ".js": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
   ".json": "application/json; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".wasm": "application/wasm",
 };
 
 const server = createServer((req, res) => {
@@ -37,6 +76,26 @@ const server = createServer((req, res) => {
     const lens = (url.searchParams.get("lens") ?? "balanced") as Lens;
     res.writeHead(200, { "content-type": MIME[".json"]! });
     res.end(JSON.stringify(tasksFor(claims, drivers, lens)));
+    return;
+  }
+
+  if (url.pathname.startsWith("/models/")) {
+    serveModelFile(req, res, decodeURIComponent(url.pathname.slice("/models/".length)));
+    return;
+  }
+
+  // Which model files this server has locally; the page uses them instead of the internet.
+  if (url.pathname === "/local") {
+    const has = (rel: string) => existsSync(join(MODELS, rel));
+    const spec = EMBEDDERS[DEFAULT_EMBEDDER]!;
+    res.writeHead(200, { "content-type": MIME[".json"]! });
+    res.end(
+      JSON.stringify({
+        bonsai: has(LOCAL.bonsai) ? `/models/${LOCAL.bonsai}` : null,
+        hf: has(join(LOCAL.hf, spec.repo, "config.json")) ? `/models/${LOCAL.hf}/` : null,
+        ort: has(join(LOCAL.ort, "ort-wasm-simd-threaded.jsep.wasm")) ? `/models/${LOCAL.ort}/` : null,
+      }),
+    );
     return;
   }
 

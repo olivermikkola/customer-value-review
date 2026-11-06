@@ -221,6 +221,18 @@ ja se on koko pitchin teesi.
 
 Kolmas on tärkeä: katsaus joka löytää vain ongelmia tuntuu auditoinnilta.
 
+## Esityskoneen valmistelu (kerran, illalla tai aamulla hyvässä verkossa)
+
+```bash
+git clone https://github.com/olivermikkola/lindstr-m && cd lindstr-m
+npm install
+npm run models      # ~1,2 Gt kerran → models/
+npm run ui          # http://localhost:5173 — avaa kerran, odota "valmiina"
+```
+
+Tämän jälkeen demo toimii **ilman nettiä**. Avatkaa sivu `localhost`-osoitteesta
+esityskoneella (WebGPU ei toimi toisen koneen IP-osoitteesta). Chrome tai Edge.
+
 ## Tekoäly selaimessa: kysy katsaukselta (60–90 s)
 
 Mallit (Ternary Bonsai 2 4B ~0,95 Gt + EmbeddingGemma ~0,2 Gt) latautuvat taustalle kun sivu aukeaa. Avatkaa sivu
@@ -239,7 +251,10 @@ Kysykää tässä järjestyksessä, kirjoittamalla kenttään:
 4. *(valinnainen)* **"Miten vedenkulutus käyttäytyi joulukuussa?"** → Q4-luku tulee ensin.
    *"Sanat löytävät ehdokkaat, toinen pieni malli ymmärtää merkityksen ja valitsee niistä.
    Se ei koskaan päätä, vastataanko — siksi kohdan 3 kysymys saa edelleen rehellisen 'ei dataa'."*
-5. Klikatkaa **"todiste →"** vastauksessa → sama luku aukeaa kaavaan ja raakatapahtumiin.
+5. **"Toimitetaanko vaatteet ajallaan?"** → "ei todennettua dataa" + kortti
+   **Lisämoduuli: Transparency & control**. *"Rehellinen ei kertoo myös, mikä Lindströmin
+   oma moduuli vastaisi — nimet ovat teidän omasta esimerkkidashboardistanne."*
+6. Klikatkaa **"todiste →"** vastauksessa → sama luku aukeaa kaavaan ja raakatapahtumiin.
 
 Lause jonka sanotte: *"Malli ajetaan asiakkaan omassa selaimessa — data ei lähde
 tekoälyyhtiölle, eikä per-katsaus AI-kulua synny. Ja koska koodi laskee ja portti
