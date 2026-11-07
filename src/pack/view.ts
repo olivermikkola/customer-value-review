@@ -401,15 +401,24 @@ function observe(v: CustomerView, R: Reader, L: PackLedger, p: Params): Observat
   // 1 · allocation outliers
   {
     const ranked = [...sites].sort((a, b) => b.m.excess_pieces!.value - a.m.excess_pieces!.value);
-    const top = ranked.slice(0, Math.min(3, ranked.length));
     const totalExcess = avg("excess_pieces");
-    const topSum = top.reduce((a, s) => a + s.m.excess_pieces!.value, 0);
+    // The sites that make up the bulk (about 70 %) of the surplus, at most three.
+    const top: typeof ranked = [];
+    let acc = 0;
+    for (const s of ranked) {
+      if (top.length >= 3 || (top.length > 0 && acc >= 0.7 * totalExcess.value)) break;
+      top.push(s);
+      acc += s.m.excess_pieces!.value;
+    }
+    const topSum = acc;
+    const names = top.map((s) => short(s.name));
+    const nameList = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : (names[0] ?? "");
     if (totalExcess.value > 0) {
       out.push({
         id: "obs:allocation",
         theme: "cost",
         tone: "act",
-        headline: `${top.map((s) => short(s.name)).join(", ")} hold ${pct((topSum / totalExcess.value) * 100)} of the surplus garments`,
+        headline: `${nameList} ${names.length > 1 ? "hold" : "holds"} ${pct((topSum / totalExcess.value) * 100)} of the surplus garments`,
         detail: `Customer-wide, ${avg("util_pct").display} of allocated garments are scanned in use. Against that average, about ${totalExcess.display} garments are allocated above need, concentrated at ${top.length} sites.`,
         evidence: [ev("Customer utilisation", avg("util_pct")), ev("Surplus garments, customer", totalExcess), ...top.map((s) => ev(`Surplus at ${s.name}`, s.m.excess_pieces!))],
         discuss: `Which of the ${top.length} sites with the most surplus garments can reduce their allocation without hurting availability?`,

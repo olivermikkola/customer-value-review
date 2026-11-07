@@ -118,7 +118,7 @@ export function buildDeck(v: CustomerView): Promise<Buffer> {
     tile(s, 0.6, 5.15, 2.9, "Service requests", cells[2]!, "per 1 000 wearers");
     const q = v.series.quarterly.find((x) => x.key === "on_time_pct")!;
     s.addText("On-time cycles by quarter (%)", { x: 3.9, y: 1.7, w: 4.5, h: 0.3, fontFace: FONT, fontSize: 13, bold: true, color: C.ink });
-    s.addChart(p.ChartType.line, [{ name: "On time", labels: q.points.map((x) => x.period), values: q.points.map((x) => x.cell.value) }], { x: 3.9, y: 2.0, w: 4.5, h: 3.0, chartColors: [C.accent], lineSize: 2.5, lineDataSymbolSize: 8, showValue: true, dataLabelFontSize: 10, dataLabelFormatCode: "0.0", valAxisLabelFontSize: 9, catAxisLabelFontSize: 10, valGridLine: { color: C.line, size: 0.5 }, showLegend: false } as never);
+    s.addChart(p.ChartType.line, [{ name: "On time", labels: q.points.map((x) => x.period), values: q.points.map((x) => x.cell.value) }], { x: 3.9, y: 2.0, w: 4.5, h: 3.0, chartColors: [C.accent], lineSize: 2.5, lineDataSymbolSize: 8, showValue: true, dataLabelFontSize: 10, dataLabelFormatCode: "0.0", valAxisLabelFontSize: 9, catAxisLabelFontSize: 10, valGridLine: { color: C.line, size: 0.5 }, valAxisMinVal: 90, valAxisMaxVal: 100, valAxisMajorUnit: 2, showLegend: false } as never);
     const low = [...v.sites].sort((a, b) => a.m.on_time_pct!.value - b.m.on_time_pct!.value).slice(0, 5);
     s.addText("Lowest on-time sites", { x: 8.8, y: 1.7, w: 4, h: 0.3, fontFace: FONT, fontSize: 13, bold: true, color: C.ink });
     tbl(s, [[{ text: "Site", options: { bold: true } }, { text: "On time", options: { bold: true, align: "right" } }, { text: "Cycle", options: { bold: true, align: "right" } }], ...low.map((x) => [x.name, { text: x.m.on_time_pct!.display, options: { align: "right" } }, { text: x.m.avg_cycle_h!.display, options: { align: "right" } }])], { x: 8.8, y: 2.05, w: 4, colW: [2.2, 0.9, 0.9], fontFace: FONT, fontSize: 11, color: C.ink, border: { type: "solid", color: C.line, pt: 0.5 }, rowH: 0.36 });
@@ -161,9 +161,9 @@ export function buildDeck(v: CustomerView): Promise<Buffer> {
     const sorted = [...v.sites].sort((a, b) => (worseHigh ? b.m[first]!.value - a.m[first]!.value : a.m[first]!.value - b.m[first]!.value));
     const show = sorted.slice(0, 8);
     const s = base(`Where the sites differ: ${priorityLabel}`, "Site drill-down", "Sites, Service_Activity, Service_Cycles, Repairs, Laundry_Resources", show.map((x) => ({ label: x.name, cell: x.m[first]! })));
-    s.addText(`The 8 least favourable of ${v.sites.length} sites on “${label[first]}”, with the customer total. The dashboard lists every site.`, { x: 0.6, y: 1.55, w: 12, h: 0.4, fontFace: FONT, fontSize: 13, color: C.ink2 });
+    s.addText(`${v.sites.length <= 8 ? `All ${v.sites.length} sites` : `The 8 least favourable of ${v.sites.length} sites`}, ordered by “${label[first]}”, with the customer total. The dashboard lets you sort by every column.`, { x: 0.6, y: 1.55, w: 12, h: 0.4, fontFace: FONT, fontSize: 13, color: C.ink2 });
     const head = [{ text: "Site", options: { bold: true } }, ...cols.map((c) => ({ text: label[c] ?? c, options: { bold: true, align: "right" as const } }))];
-    const body = show.map((x) => [`${x.name}  (${x.city})`, ...cols.map((c) => ({ text: x.m[c]!.display, options: { align: "right" as const } }))]);
+    const body = show.map((x) => [x.name.includes(x.city) ? x.name : `${x.name}  (${x.city})`, ...cols.map((c) => ({ text: x.m[c]!.display, options: { align: "right" as const } }))]);
     const total = [{ text: "Customer", options: { bold: true } }, ...cols.map((c) => ({ text: v.customerMetrics[c]!.display, options: { align: "right" as const, bold: true } }))];
     tbl(s, [head, ...body, total], { x: 0.6, y: 2.05, w: 12.1, colW: [4.2, ...cols.map(() => 7.9 / cols.length)], fontFace: FONT, fontSize: 12, color: C.ink, border: { type: "solid", color: C.line, pt: 0.5 }, rowH: 0.4 });
   }
@@ -177,8 +177,9 @@ export function buildDeck(v: CustomerView): Promise<Buffer> {
       const y = 1.6 + Math.floor(i / 2) * 2.65;
       s.addShape(p.ShapeType.roundRect, { x, y, w: 5.95, h: 2.5, rectRadius: 0.08, fill: { color: C.white }, line: { color: C.line } });
       s.addShape(p.ShapeType.ellipse, { x: x + 0.18, y: y + 0.2, w: 0.14, h: 0.14, fill: { color: o.tone === "act" ? C.act : o.tone === "watch" ? C.warn : C.good }, line: { color: C.white, width: 0 } });
-      s.addText(o.headline, { x: x + 0.4, y: y + 0.08, w: 5.4, h: 0.85, fontFace: FONT, fontSize: 13.5, bold: true, color: C.ink, valign: "top", fit: "shrink" });
-      s.addText([{ text: "Action: ", options: { bold: true } }, { text: `${o.action.title} (${o.action.effort} effort)`, options: { breakLine: true } }, { text: "Limits: ", options: { bold: true, color: C.muted } }, { text: o.caveat, options: { color: C.muted } }], { x: x + 0.2, y: y + 0.95, w: 5.6, h: 1.5, fontFace: FONT, fontSize: 10.5, color: C.ink2, valign: "top", fit: "shrink" });
+      s.addText(o.headline, { x: x + 0.4, y: y + 0.08, w: 5.4, h: 0.7, fontFace: FONT, fontSize: 13.5, bold: true, color: C.ink, valign: "top", fit: "shrink" });
+      s.addText(o.detail, { x: x + 0.4, y: y + 0.78, w: 5.4, h: 0.85, fontFace: FONT, fontSize: 10.5, color: C.ink2, valign: "top", fit: "shrink" });
+      s.addText([{ text: "Action: ", options: { bold: true } }, { text: `${o.action.title} (${o.action.effort} effort)`, options: { breakLine: true } }, { text: "Limits: ", options: { bold: true, color: C.muted } }, { text: o.caveat, options: { color: C.muted } }], { x: x + 0.4, y: y + 1.62, w: 5.4, h: 0.82, fontFace: FONT, fontSize: 9.5, color: C.ink2, valign: "top", fit: "shrink" });
     });
   }
 
@@ -191,7 +192,7 @@ export function buildDeck(v: CustomerView): Promise<Buffer> {
       s.addText(o.discuss, { x: 1.4, y, w: 7.2, h: 0.85, fontFace: FONT, fontSize: 14, color: C.ink, valign: "middle", fit: "shrink" });
       s.addText([{ text: "Agree: ", options: { bold: true } }, { text: o.action.title }], { x: 8.8, y, w: 4, h: 0.85, fontFace: FONT, fontSize: 11.5, color: C.ink2, valign: "middle", fit: "shrink" });
     });
-    s.addText("Each agreed action should get a measure and a date, so the next review can show whether it worked.", { x: 0.6, y: 6.5, w: 12, h: 0.35, fontFace: FONT, fontSize: 11, color: C.muted });
+    s.addText("Each agreed action should get a measure and a date, so the next review can show whether it worked.", { x: 0.6, y: 6.25, w: 12, h: 0.35, fontFace: FONT, fontSize: 11, color: C.muted });
   }
 
   // 11 · method
