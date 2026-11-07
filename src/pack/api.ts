@@ -25,7 +25,7 @@ export function loadFromPack(pack: Pack): Loaded {
   const ledgers = new Map<string, PackLedger>();
   for (const c of pack.customers) {
     const L = buildPackLedger(pack, str(c, "customer_id"));
-    // Same rule as the rest of LANKA: if a number does not recompute, the server does not start.
+    // Same rule throughout the review: if a number does not recompute, the server does not start.
     const bad = L.measures.find((m) => !measureRecomputes(m, L.idx));
     if (bad) throw new Error(`measure ${bad.id} does not recompute from its inputs`);
     ledgers.set(L.customerId, L);

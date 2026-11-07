@@ -7,7 +7,7 @@ import { chromium } from "playwright-core";
 const [mode = "write", ...rest] = process.argv.slice(2);
 const port = process.env.PORT ?? "5173";
 const model = process.env.MODEL ?? "4B";
-const browser = await chromium.launchPersistentContext("/tmp/lanka-chrome-profile", {
+const browser = await chromium.launchPersistentContext("/tmp/cvr-chrome-profile", {
   executablePath: process.env.CHROME ?? "/usr/bin/google-chrome",
   headless: true,
   viewport: { width: 1280, height: 900 },
@@ -27,7 +27,7 @@ if (mode === "ask") {
   const [customer = "CUST001", priority = "overview"] = rest;
   await page.evaluate(([c, p]) => window.__setView({ customer: c, priority: p }), [customer, priority]);
   const run = await page.evaluate(() => window.__aiWrite());
-  const shot = `/tmp/lanka-review-${customer}-${priority}.png`;
+  const shot = `/tmp/cvr-review-${customer}-${priority}.png`;
   await page.screenshot({ path: shot, fullPage: false });
   console.log(JSON.stringify({ ...run, blocks: Object.fromEntries(Object.entries(run.blocks).map(([k, b]) => [k, { title: b.title, sentences: b.sentences.map((s) => `${s.by === "model" ? "AI   " : "rules"} ${s.text}`), refused: b.refused.map((r) => `${r.code}: ${r.sentence}`) }])) }, null, 2));
   console.error("screenshot:", shot);
