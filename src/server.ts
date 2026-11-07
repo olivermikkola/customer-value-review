@@ -9,7 +9,7 @@ import { TOPICS } from "./topics.ts";
 import { DEFAULT_EMBEDDER, EMBEDDERS } from "./embedders.ts";
 import type { Lens } from "./review.ts";
 import { LOCAL, MODELS } from "./local.ts";
-import { ask as packAsk, loadAll, meta as packMeta, trace as packTrace, view as packView } from "./pack/api.ts";
+import { deck as packDeck, ask as packAsk, loadAll, meta as packMeta, trace as packTrace, view as packView } from "./pack/api.ts";
 
 const pack = await loadAll();
 
@@ -64,6 +64,18 @@ const MIME: Record<string, string> = {
 
 const server = createServer((req, res) => {
   const url = new URL(req.url ?? "/", "http://localhost");
+
+  if (url.pathname === "/api/export.pptx") {
+    packDeck(pack, url.searchParams.get("customer") ?? "CUST001", url.searchParams).then(
+      (d) => {
+        if (!d) return void res.writeHead(404).end("unknown customer");
+        res.writeHead(200, { "content-type": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "content-disposition": `attachment; filename="${d.name}"`, "cache-control": "no-store" });
+        res.end(d.body);
+      },
+      (e) => res.writeHead(500).end(String(e)),
+    );
+    return;
+  }
 
   if (url.pathname.startsWith("/api/")) {
     const json = (code: number, body: unknown) => {

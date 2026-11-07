@@ -258,7 +258,7 @@ export function buildView(L: PackLedger, pack: Pack, p: Params, siteId?: string)
     post: ranged(base("post", "Replacements postponed", "circularity", "rep_postponed", p.scenario, "estimate · 1 repair ≈ 1 replacement"), "rep_postponed", (s) => s),
     postCo2: ranged(base("postCo2", "Avoided product emissions", "circularity", "rep_avoided_co2", p.scenario, "estimate from repairs"), "rep_avoided_co2", (s) => s),
     postEur: ranged(base("postEur", "Avoided purchase cost", "circularity", "rep_avoided_eur", p.scenario, "estimate, synthetic prices"), "rep_avoided_eur", (s) => s),
-    div: base("div", "Textile waste kept out of incineration", "circularity", "w_div_pct", undefined, "allocated estimate"),
+    div: base("div", "Waste kept out of incineration", "circularity", "w_div_pct", undefined, "allocated estimate"),
     waste: base("waste", "Textile waste attributed", "circularity", "w_total", undefined, "allocated estimate"),
     waterS: ranged(base("waterS", "Water saved vs. alternative", "water", "sav_water", bl, `vs. ${baselineName.toLowerCase()}`), "sav_water", blv),
     waterP: base("waterP", "Water saving", "water", "sav_water_pct", bl, `vs. ${baselineName.toLowerCase()}`),

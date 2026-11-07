@@ -5,6 +5,7 @@ import { measureRecomputes } from "../ledger.ts";
 import type { Measure } from "../model.ts";
 import { BASELINE_IDS, buildPackLedger, SCENARIOS, YEAR, type BaselineId, type PackLedger, type Scenario } from "./build.ts";
 import { PACK_FILE } from "./file.ts";
+import { buildDeck } from "./deck.ts";
 import { readPack, str, type Pack } from "./read.ts";
 import { buildView, DEFAULT_PARAMS, fmt, interpret, PRIORITIES, PRIORITY_INFO, type Params, type Priority } from "./view.ts";
 
@@ -108,4 +109,11 @@ function describe(L: PackLedger, name: string, ref: string) {
   }
   const f = L.idx.factors.get(ref)!;
   return { name, ref, kind: "factor" as const, label: f.name, display: `${f.value} ${f.unit}`, value: f.value, unit: f.unit, status: f.status ?? "estimated", source: f.sourceRef };
+}
+
+export async function deck(d: Loaded, customer: string, q: URLSearchParams) {
+  const v = view(d, customer, q);
+  if (!v) return null;
+  const name = `${v.customer.name.replace(/[^A-Za-z0-9]+/g, "_")}_review_${v.params.period === "FY" ? "2025" : v.params.period}_${v.params.priority}.pptx`;
+  return { name, body: await buildDeck(v) };
 }
