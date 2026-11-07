@@ -13,6 +13,8 @@ npm run check     # typecheck + tests + verify
 - `src/pack/` reads the xlsx, builds the verifiable ledger (Excel cell → source → measure → site → customer), the view model and the rule-generated observations.
 - `web/index.html` is the dashboard. Every figure opens its evidence chain; every figure carries a status (synthetic, calculated, allocated, estimated).
 - To use an approved export instead of the synthetic pack: `LANKA_PACK=/path/to/export.xlsx npm run ui` (same sheet and column names).
+- **On-device AI (optional, WebGPU).** `web/narrate.js` runs a small model (Ternary Bonsai 2) in the browser. It rewrites the findings in plain words and answers questions. It never computes: it is handed the figures of one finding and may only restate them. `src/pack/narrate.ts` is the checker: every figure must be one it was given, an estimate must be called an estimate, and causes, overclaims, copied fact layouts and sites outside the facts are refused. After a refused answer the model gets one retry; after that the rules-written sentence is shown, marked "Rules". Without WebGPU everything else still works. `npm run models` downloads the weights once for offline demos.
+  - `node scripts/review-ai-run.mjs write CUST001 water` and `... ask "question"` run the real model in headless Chrome (`PORT=… npm run ui` first); `node scripts/review-ai-eval.mjs` measures acceptance across every customer and priority.
 - The earlier Finnish concept demo and its browser-model experiments live at `/legacy` and are described below.
 
 ---

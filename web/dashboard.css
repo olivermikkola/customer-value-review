@@ -269,3 +269,24 @@ button.inp:hover { background: var(--accent-soft); }
 .panel table, .cmp-side table { display: block; overflow-x: auto; }
 
 a.btn { text-decoration: none; display: inline-block; align-self: flex-end; }
+
+/* ---------- on-device AI ---------- */
+.ai { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.ai-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.ai-row .muted { flex: 1; min-width: 220px; }
+.ai-summary h3, .ai-ask h3 { margin-bottom: 6px; }
+.ai-sent { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ai-sent li { font-size: 15px; }
+.by { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; margin-right: 4px; vertical-align: 1px; }
+.by.model { background: var(--accent-soft); color: var(--accent); }
+.by.rules { background: var(--surface-2); color: var(--ink-3); border: 1px solid var(--line-2); }
+.proof { background: none; border: 0; padding: 0 0 0 6px; color: var(--accent); font-size: 12.5px; text-decoration: underline dotted; }
+.gate { font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
+.gate code { background: var(--act-soft); color: var(--act); border-radius: 5px; padding: 0 6px; font-size: 11.5px; }
+.gate ul { margin: 6px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.ai-ask { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.ai-nodata { color: var(--ink-2); }
+.module-card { border: 1px dashed var(--line-2); border-radius: 10px; padding: 10px 14px; margin-top: 8px; background: var(--surface-2); }
+.module-tag { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 8px; }
+.module-card p { margin-top: 4px; font-size: 13.5px; color: var(--ink-2); }
+.ai-detail { color: var(--ink); }

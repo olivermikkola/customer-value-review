@@ -5,6 +5,7 @@ import { measureRecomputes } from "../ledger.ts";
 import type { Measure } from "../model.ts";
 import { BASELINE_IDS, buildPackLedger, SCENARIOS, YEAR, type BaselineId, type PackLedger, type Scenario } from "./build.ts";
 import { PACK_FILE } from "./file.ts";
+import { gateText, routeQuestion, tasksFor, toPublic, summaryTask, observationTask, type Task } from "./narrate.ts";
 import { buildDeck } from "./deck.ts";
 import { readPack, str, type Pack } from "./read.ts";
 import { buildView, DEFAULT_PARAMS, fmt, interpret, PRIORITIES, PRIORITY_INFO, type Params, type Priority } from "./view.ts";
@@ -116,4 +117,55 @@ export async function deck(d: Loaded, customer: string, q: URLSearchParams) {
   if (!v) return null;
   const name = `${v.customer.name.replace(/[^A-Za-z0-9]+/g, "_")}_review_${v.params.period === "FY" ? "2025" : v.params.period}_${v.params.priority}.pptx`;
   return { name, body: await buildDeck(v) };
+}
+
+// ------------------------------------------------------------------ language-model layer
+
+function viewParams(d: Loaded, customer: string, q: URLSearchParams) {
+  const L = d.ledgers.get(customer);
+  if (!L) return null;
+  return paramsFrom(q, L);
+}
+
+/** The tasks the browser model works through for this exact view. */
+export function narrate(d: Loaded, customer: string, q: URLSearchParams) {
+  const v = view(d, customer, q);
+  return v ? { view: { periodLabel: v.periodLabel, baseline: v.baselineLabel }, tasks: tasksFor(v).map(toPublic) } : null;
+}
+
+/** A free-text question: either an honest "no data" (with the module that would answer it) or a task for the model. */
+export function answer(d: Loaded, customer: string, text: string, q: URLSearchParams) {
+  const L = d.ledgers.get(customer);
+  if (!L) return null;
+  const interp = interpret(text, L);
+  const params = new URLSearchParams(q);
+  params.set("priority", interp.priority);
+  if (interp.baseline) params.set("baseline", interp.baseline);
+  if (interp.period) params.set("period", interp.period);
+  const v = view(d, customer, params)!;
+  const routed = routeQuestion(v, text, interp);
+  return "noData" in routed ? { interpretation: interp, ...routed } : { interpretation: interp, task: toPublic(routed.task), params: Object.fromEntries(params) };
+}
+
+function rebuild(d: Loaded, customer: string, q: URLSearchParams, taskId: string, question?: string): { task: Task; view: ReturnType<typeof buildView> } | null {
+  const L = d.ledgers.get(customer);
+  if (!L) return null;
+  if (taskId === "answer") {
+    const interp = interpret(question ?? "", L);
+    const v = view(d, customer, q)!;
+    const routed = routeQuestion(v, question ?? "", interp);
+    return "task" in routed ? { task: routed.task, view: v } : null;
+  }
+  const v = view(d, customer, q)!;
+  if (taskId === "summary") return { task: summaryTask(v), view: v };
+  const o = v.observations.find((x) => x.id === taskId);
+  return o ? { task: observationTask(v, o), view: v } : null;
+}
+
+/** The gate. The task is rebuilt here from the view, so the browser cannot widen what the model may say. */
+export function gate(d: Loaded, body: { customer?: string; params?: Record<string, string>; task?: string; question?: string; raw?: string; keep?: string[] }) {
+  const r = rebuild(d, body.customer ?? "CUST001", new URLSearchParams(body.params ?? {}), String(body.task ?? ""), body.question);
+  if (!r) return null;
+  const keep = Array.isArray(body.keep) ? body.keep.map(String) : [];
+  return gateText(r.task, r.view, String(body.raw ?? ""), keep);
 }
