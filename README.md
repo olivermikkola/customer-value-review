@@ -1,5 +1,7 @@
 # Customer Value Review (Since AI Hackathon 2026, Lindström challenge)
 
+**Demo video (3:01):** [watch / download](https://github.com/olivermikkola/lindstr-m/releases/download/demo-video-v2/Lindstrom_Customer_Value_Review_demo_v2.mp4)
+
 A customer-level value and sustainability review for a fictional multi-site customer, built on the
 official synthetic data pack. **All data is synthetic; nothing here is audited or real Lindström performance.**
 
