@@ -14,7 +14,7 @@ function must<T>(value: T | null, what: string): T {
 
 /** Boot the real app.js against the real payload, in a real DOM. */
 async function boot() {
-  const html = readFileSync(join(ROOT, "web", "index.html"), "utf8");
+  const html = readFileSync(join(ROOT, "web", "legacy.html"), "utf8");
   const js = readFileSync(join(ROOT, "web", "app.js"), "utf8");
   const data = JSON.parse(JSON.stringify(buildUiData()));
 

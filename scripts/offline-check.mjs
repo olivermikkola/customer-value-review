@@ -22,7 +22,7 @@ await browser.route("**/*", (route) => {
 });
 const page = await browser.newPage();
 const t0 = Date.now();
-await page.goto("http://localhost:5173/");
+await page.goto("http://localhost:5173/legacy");
 await page.waitForFunction(() => /valmiina|epäonnistui|Virhe/.test(document.getElementById("edgeStatus").textContent), null, {
   timeout: 180000,
 });
