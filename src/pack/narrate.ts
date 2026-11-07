@@ -69,7 +69,8 @@ function factsOf(items: { label: string; cell: Cell; note?: string }[]): Fact[] 
 
 function siteNamesIn(view: CustomerView, facts: Fact[], context: string): string[] {
   const text = `${facts.map((f) => f.label).join(" ")} ${context}`;
-  return view.sites.filter((s) => text.includes(s.name)).map((s) => s.name);
+  // A site named by its city ("Västerås") in the rules text is as much "given" as its full name.
+  return view.sites.filter((s) => text.includes(s.name) || text.includes(s.city)).map((s) => s.name);
 }
 
 function build(view: CustomerView, base: Omit<Task, "system" | "user" | "siteNames" | "context"> & { instruction: string; question?: string; context?: string }): Task {
@@ -99,6 +100,43 @@ export function summaryTask(view: CustomerView): Task {
   });
 }
 
+/**
+ * The note that opens the meeting. Rules pick the findings (one that went well, one that needs
+ * attention, and its proposed action); the model's job is to turn them into a short message for this
+ * customer's decision-maker. That is the part rules write badly, and the gate still owns every figure.
+ */
+const PRIORITY_WORDS: Record<string, string | undefined> = { water: "water use", emissions: "emissions", cost: "cost and allocation", circularity: "repair and circularity", service: "service reliability" };
+
+export function noteTask(view: CustomerView): Task {
+  const obs = view.observations;
+  const good = obs.find((o) => o.tone === "good") ?? obs[0];
+  if (!good) return summaryTask(view);
+  const attention = obs.find((o) => o !== good && o.tone !== "good") ?? obs.find((o) => o !== good);
+  const picked = [good, attention].filter(Boolean) as Observation[];
+  const facts = factsOf(picked.flatMap((o) => o.evidence.slice(0, 2)));
+  const priority = PRIORITY_WORDS[view.params.priority];
+  const lines = [
+    `Went well: ${good.headline}`,
+    ...(attention ? [`Needs attention: ${attention.headline}`, `Question for the meeting: ${attention.discuss}`, `Proposed next step: ${attention.action.title}`] : []),
+  ];
+  return build(view, {
+    context: picked.map((o) => `${o.headline} ${o.discuss} ${o.action.title}`).join(" "),
+    id: "summary",
+    kind: "summary",
+    title: `A note to open the meeting with ${view.customer.name}`,
+    maxSentences: 3,
+    facts,
+    fallbacks: picked.map((o) => o.headline.replace(/\.?$/, ".")),
+    instruction: [
+      ...lines,
+      "",
+      `Write a short note, three sentences, that the account manager can read out to open the yearly review with ${view.customer.name}${priority ? `, whose top concern is ${priority}` : ""}.`,
+      "Sentence 1: what went well, with one figure. Sentence 2: what needs attention, with one figure. Sentence 3: what we propose to agree in the meeting, with no figure.",
+      "Address the customer as 'you' and the service provider as 'we'. Warm and direct, like a person talking, not a report.",
+    ].join("\n"),
+  });
+}
+
 export function observationTask(view: CustomerView, o: Observation): Task {
   const facts = factsOf(o.evidence);
   return build(view, {
@@ -114,7 +152,7 @@ export function observationTask(view: CustomerView, o: Observation): Task {
 }
 
 export function tasksFor(view: CustomerView, max = 4): Task[] {
-  return [summaryTask(view), ...view.observations.slice(0, max).map((o) => observationTask(view, o))];
+  return [noteTask(view), ...view.observations.slice(0, max).map((o) => observationTask(view, o))];
 }
 
 export function toPublic(t: Task): PublicTask {

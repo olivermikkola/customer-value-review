@@ -5,7 +5,7 @@ import { measureRecomputes } from "../ledger.ts";
 import type { Measure } from "../model.ts";
 import { BASELINE_IDS, buildPackLedger, SCENARIOS, YEAR, type BaselineId, type PackLedger, type Scenario } from "./build.ts";
 import { PACK_FILE } from "./file.ts";
-import { gateText, routeQuestion, tasksFor, toPublic, summaryTask, observationTask, type Task } from "./narrate.ts";
+import { gateText, routeQuestion, tasksFor, toPublic, noteTask, observationTask, type Task } from "./narrate.ts";
 import { answerQuestion, intentTexts, THRESHOLDS } from "./answer.ts";
 import { buildDeck } from "./deck.ts";
 import { readPack, str, type Pack } from "./read.ts";
@@ -162,7 +162,7 @@ function rebuild(d: Loaded, customer: string, q: URLSearchParams, taskId: string
     return "task" in routed ? { task: routed.task, view: v } : null;
   }
   const v = view(d, customer, q)!;
-  if (taskId === "summary") return { task: summaryTask(v), view: v };
+  if (taskId === "summary") return { task: noteTask(v), view: v };
   const o = v.observations.find((x) => x.id === taskId);
   return o ? { task: observationTask(v, o), view: v } : null;
 }

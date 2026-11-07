@@ -213,3 +213,31 @@ describe("API", () => {
     assert.ok(g.rejected.length > 0);
   });
 });
+
+describe("the meeting note", () => {
+  test("pairs what went well with what needs attention, led by the customer's priority", () => {
+    const v = v1();
+    const t = tasksFor(v)[0]!;
+    assert.equal(t.id, "summary");
+    assert.match(t.title, /note to open the meeting/);
+    assert.match(t.user, /Went well: Estimated 1,407 m³ less fresh water/);
+    assert.match(t.user, /Needs attention: /);
+    assert.match(t.user, /top concern is water use/);
+  });
+
+  test("the server gate grades the note against the note's own facts, not another task's", () => {
+    const g = gate(d, { customer: "CUST001", params: { priority: "water" }, task: "summary", raw: "You saved an estimated 1,407 m³ of fresh water compared to local laundry.\nThree sites hold most of the 185 surplus garments.\nLet's agree a target level for those sites." })!;
+    assert.deepEqual(g.rejected, []);
+    assert.equal(g.accepted.length, 3);
+  });
+
+  test("a site named by its city in the rules text may be named; one that is not given is still refused", () => {
+    const g = gate(d, { customer: "CUST001", params: { priority: "water" }, task: "summary", raw: "You saved an estimated 1,407 m³ of fresh water.\nVästerås, Gothenburg and Kuopio hold the most surplus garments.\nLet's agree a target level." })!;
+    assert.deepEqual(g.rejected, []);
+    const v = v1();
+    const named = new Set(["Västerås", "Gothenburg", "Kuopio"]);
+    const other = v.sites.find((s) => !named.has(s.city) && !tasksFor(v)[0]!.user.includes(s.city))!;
+    const bad = gate(d, { customer: "CUST001", params: { priority: "water" }, task: "summary", raw: `You saved an estimated 1,407 m³ of fresh water at ${other.city}.` })!;
+    assert.deepEqual(bad.rejected.map((r) => r.code), ["WRONG_SITE"]);
+  });
+});

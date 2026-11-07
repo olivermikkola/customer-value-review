@@ -225,7 +225,8 @@ function kpiTile(k, first) {
     range = el("div", { class: "r" }, el("div", { class: "rangebar", "aria-hidden": "true" }, el("i", { style: "left:0;right:0" }), el("b", { style: `left:${pos}%` })), el("span", {}, `${k.range.low.display} to ${k.range.high.display} (low to high)`));
   }
   return el("button", { class: `card kpi${first ? " first" : ""}`, type: "button", onclick: () => openEvidence(c.id) },
-    el("div", { class: "l" }, el("span", {}, k.label), badge(c.status)),
+    // "Calculated" is the normal case; only figures that rest on an assumption carry a label here.
+    el("div", { class: "l" }, el("span", {}, k.label), c.status === "calculated" ? null : badge(c.status)),
     el("div", { class: "v" }, c.display),
     el("div", { class: "s" }, k.sub ?? ""),
     range,
@@ -423,10 +424,12 @@ function sentenceList(sentences) {
     (x.facts ?? []).slice(0, 3).map((f) => el("button", { class: "proof", type: "button", onclick: () => openEvidence(f.measureId), "data-tip": `Evidence for ${f.label}` }, `${f.display} →`)),
   )));
 }
-function refusedList(refused) {
+function refusedList(refused, open = false) {
   if (!refused.length) return null;
-  return el("details", { class: "gate" }, el("summary", {}, `The checker refused ${refused.length} sentence${refused.length > 1 ? "s" : ""}`),
+  const d = el("details", { class: "gate" }, el("summary", {}, `The checker stopped ${refused.length} sentence${refused.length > 1 ? "s" : ""} before they reached the page`),
     el("ul", {}, refused.map((r) => el("li", {}, el("code", {}, r.code), " ", r.sentence || "(nothing written)", el("small", {}, ` ${r.detail}`)))));
+  d.open = open; // not via el(): it treats "on…" attributes as event handlers
+  return d;
 }
 function aiBlock(id) {
   const b = aiBlocks()?.[id];
@@ -440,6 +443,7 @@ async function doWrite() {
   const blocksNow = {};
   state.ai = { key, blocks: blocksNow };
   const run = await AI.writeAll(aiCtx(), (id, b) => { blocksNow[id] = b; if (aiKey() === key) render(); });
+  if (state.ai?.key === key) state.ai.done = true;
   render();
   return run;
 }
@@ -456,11 +460,11 @@ function aiSection(v) {
   const summary = blocks?.summary;
   const model = blocks ? Object.values(blocks).flatMap((b) => b.sentences) : [];
   return el("section", {},
-    el("div", { class: "sec-head" }, el("h2", {}, "In plain words"), el("p", {}, "A small language model running in this browser rewrites the findings for a decision-maker. It is handed finished figures and may only restate them. A checker refuses any figure it was not given, any cause or overclaim, and any estimate not called an estimate.")),
+    el("div", { class: "sec-head" }, el("h2", {}, "In plain words"), el("p", {}, "A small language model running in this browser drafts the note that opens the meeting and words each finding for a decision-maker. Rules choose what to say and supply every figure; the model only writes. A checker refuses any figure it was not given, any cause or overclaim, and any estimate not called an estimate.")),
     el("div", { class: "card ai" },
       el("div", { class: "ai-row" }, writeBtn, status),
-      summary ? el("div", { class: "ai-summary" }, el("h3", {}, "The year in two sentences"), sentenceList(summary.sentences), refusedList(summary.refused)) : null,
-      blocks ? el("p", { class: "muted" }, `${model.filter((x) => x.by === "model").length} of ${model.length} sentences written by the model; the findings below show the same text.`) : null,
+      summary ? el("div", { class: "ai-summary" }, el("h3", {}, summary.title), sentenceList(summary.sentences), refusedList(summary.refused, true)) : null,
+      blocks && state.ai.done ? el("p", { class: "muted" }, `${model.filter((x) => x.by === "model").length} of ${model.length} sentences written by the model; the findings below show the same text.`) : null,
     ),
   );
 }
@@ -504,7 +508,7 @@ function answerView(r) {
       a.focus ? el("button", { class: "btn", type: "button", onclick: () => goTo(a.focus) }, a.focus.site ? "Open the site" : a.focus.section === "sites" ? "Show the sites table" : "Show on the dashboard") : null),
     a.followUps.length ? el("div", { class: "qa-more" }, el("span", { class: "muted" }, "Ask next"), el("div", { class: "chips" }, a.followUps.map((f) => el("button", { class: "chip", type: "button", onclick: () => submit(f) }, f)))) : null,
     alts.length && a.type !== "clarify" ? el("div", { class: "qa-more" }, el("span", { class: "muted" }, "Not what you meant? Answer as"), el("div", { class: "chips" }, alts.map((c) => el("button", { class: "chip ghost", type: "button", onclick: () => submit(state.qa.question, c.intent) }, c.label)))) : null,
-    el("p", { class: "qa-read muted" }, `Read ${a.read.via === "keywords" ? "from keywords only (the meaning model is not loaded)" : "by meaning and keywords"}${a.read.matched.length ? ` · ${a.read.matched.join(", ")}` : ""}. Nothing here is generated: every figure comes from the review's ledger.`));
+    el("p", { class: "qa-read muted" }, `Read ${a.read.via === "keywords" ? "from keywords only (the meaning model is not loaded)" : "by meaning and keywords"}${a.read.matched.length ? ` · ${a.read.matched.join(", ")}` : ""}. Answered from the review's ledger, so it cannot state a figure the data does not hold.`));
 }
 
 async function submit(q, force) {

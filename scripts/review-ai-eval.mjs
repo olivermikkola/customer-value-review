@@ -14,7 +14,7 @@ const browser = await chromium.launchPersistentContext("/tmp/lanka-chrome-profil
 });
 const page = await browser.newPage();
 await page.goto(`http://localhost:${port}/?model=${model}&preload=0`);
-await page.waitForFunction(() => window.__aiWrite);
+await page.waitForFunction(() => window.__aiWrite && document.querySelector(".card.kpi"));
 let model_ = 0, total = 0, refusedN = 0, tasks = 0, tasksAllModel = 0;
 const codes = {};
 const all = [];
