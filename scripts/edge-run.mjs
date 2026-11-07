@@ -17,7 +17,7 @@ const browser = await chromium.launchPersistentContext("/tmp/lanka-chrome-profil
 });
 const page = await browser.newPage();
 page.on("console", (m) => m.type() === "error" && console.error("[page]", m.text()));
-await page.goto(`http://localhost:5173/?model=${model}&preload=0`);
+await page.goto(`http://localhost:5173/legacy?model=${model}&preload=0`);
 await page.waitForFunction(() => window.__edgeWrite && window.__lankaLens);
 
 if (asking) {

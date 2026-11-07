@@ -9,6 +9,9 @@ import { TOPICS } from "./topics.ts";
 import { DEFAULT_EMBEDDER, EMBEDDERS } from "./embedders.ts";
 import type { Lens } from "./review.ts";
 import { LOCAL, MODELS } from "./local.ts";
+import { ask as packAsk, loadAll, meta as packMeta, trace as packTrace, view as packView } from "./pack/api.ts";
+
+const pack = await loadAll();
 
 const WEB = join(import.meta.dirname, "..", "web");
 
@@ -61,6 +64,29 @@ const MIME: Record<string, string> = {
 
 const server = createServer((req, res) => {
   const url = new URL(req.url ?? "/", "http://localhost");
+
+  if (url.pathname.startsWith("/api/")) {
+    const json = (code: number, body: unknown) => {
+      res.writeHead(code, { "content-type": MIME[".json"]!, "cache-control": "no-store" });
+      res.end(JSON.stringify(body));
+    };
+    const customer = url.searchParams.get("customer") ?? "CUST001";
+    const out =
+      url.pathname === "/api/meta" ? packMeta(pack)
+      : url.pathname === "/api/view" ? packView(pack, customer, url.searchParams)
+      : url.pathname === "/api/ask" ? packAsk(pack, customer, (url.searchParams.get("q") ?? "").slice(0, 300))
+      : url.pathname === "/api/trace" ? packTrace(pack, customer, url.searchParams.get("measure") ?? "")
+      : undefined;
+    if (out === undefined) return json(404, { error: "unknown endpoint" });
+    if (out === null) return json(404, { error: "unknown customer or measure" });
+    return json(200, out);
+  }
+
+  if (url.pathname === "/legacy") {
+    res.writeHead(200, { "content-type": MIME[".html"]! });
+    res.end(readFileSync(join(WEB, "legacy.html")));
+    return;
+  }
 
   if (url.pathname === "/data.json") {
     // Rebuilt per request so the UI can never drift from the ledger.

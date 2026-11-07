@@ -2,15 +2,16 @@
  * A tiny, safe arithmetic evaluator.
  *
  * Deliberately NOT eval() and NOT a library: a measure's formula is data, and
- * data must not be able to execute. Supports + - * / parentheses and unary
- * minus over named variables.
+ * data must not be able to execute. Supports + - * / parentheses, unary
+ * minus and max()/min() over named variables.
  */
 
 type Node =
   | { t: "num"; v: number }
   | { t: "var"; name: string }
   | { t: "bin"; op: "+" | "-" | "*" | "/"; l: Node; r: Node }
-  | { t: "neg"; e: Node };
+  | { t: "neg"; e: Node }
+  | { t: "call"; fn: "max" | "min"; args: Node[] };
 
 type Token = { t: "num"; v: number } | { t: "name"; v: string } | { t: "op"; v: string };
 
@@ -40,7 +41,7 @@ function tokenize(src: string): Token[] {
       i = j;
       continue;
     }
-    if ("+-*/()".includes(c)) {
+    if ("+-*/(),".includes(c)) {
       out.push({ t: "op", v: c });
       i++;
       continue;
@@ -91,7 +92,21 @@ export function parseExpr(src: string): Node {
     const t = toks[p++];
     if (!t) throw new Error(`unexpected end of formula: ${src}`);
     if (t.t === "num") return { t: "num", v: t.v };
-    if (t.t === "name") return { t: "var", name: t.v };
+    if (t.t === "name") {
+      const next = toks[p];
+      if (next?.t === "op" && next.v === "(") {
+        if (t.v !== "max" && t.v !== "min") throw new Error(`unknown function "${t.v}" in: ${src}`);
+        p++;
+        const args = [expr()];
+        while (toks[p]?.t === "op" && (toks[p] as { v: string }).v === ",") {
+          p++;
+          args.push(expr());
+        }
+        eat(")");
+        return { t: "call", fn: t.v, args };
+      }
+      return { t: "var", name: t.v };
+    }
     if (t.v === "(") {
       const n = expr();
       eat(")");
@@ -116,6 +131,10 @@ export function evalNode(node: Node, env: Record<string, number>): number {
     }
     case "neg":
       return -evalNode(node.e, env);
+    case "call": {
+      const vals = node.args.map((a) => evalNode(a, env));
+      return node.fn === "max" ? Math.max(...vals) : Math.min(...vals);
+    }
     case "bin": {
       const l = evalNode(node.l, env);
       const r = evalNode(node.r, env);
@@ -144,6 +163,7 @@ export function variables(formula: string): string[] {
   const walk = (n: Node): void => {
     if (n.t === "var") out.add(n.name);
     else if (n.t === "neg") walk(n.e);
+    else if (n.t === "call") n.args.forEach(walk);
     else if (n.t === "bin") {
       walk(n.l);
       walk(n.r);
