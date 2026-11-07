@@ -1,3 +1,22 @@
+# Customer Value Review (Since AI Hackathon 2026, Lindström challenge)
+
+A customer-level value and sustainability review for a fictional multi-site customer, built on the
+official synthetic data pack. **All data is synthetic; nothing here is audited or real Lindström performance.**
+
+```bash
+npm install
+npm run ui        # http://localhost:5173  (reads data/pack/*.xlsx, refuses to start if any number fails to recompute)
+npm run pack      # prints NorthStar's headline numbers and reconciles them with the pack's own Customer_Impacts sheet
+npm run check     # typecheck + tests + verify
+```
+
+- `src/pack/` reads the xlsx, builds the verifiable ledger (Excel cell → source → measure → site → customer), the view model and the rule-generated observations.
+- `web/index.html` is the dashboard. Every figure opens its evidence chain; every figure carries a status (synthetic, calculated, allocated, estimated).
+- To use an approved export instead of the synthetic pack: `LANKA_PACK=/path/to/export.xlsx npm run ui` (same sheet and column names).
+- The earlier Finnish concept demo and its browser-model experiments live at `/legacy` and are described below.
+
+---
+
 # LANKA — elävä asiakaskatsaus
 
 Hackathon-konsepti Lindströmin haasteeseen: *"What value did we actually create?"*

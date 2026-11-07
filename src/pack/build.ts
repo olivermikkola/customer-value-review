@@ -617,11 +617,13 @@ export function buildPackLedger(pack: Pack, customerId: string): PackLedger {
         put(metric, lbl, key, scope, period, unit, { formula, bindings }, { status });
       ratio("util_pct", "Garment utilisation (scanned ÷ allocated)", "%", "scan / alloc * 100", { scan: g("scan"), alloc: g("alloc") });
       ratio("unused", "Allocated but not scanned", "pieces", "alloc - scan", { alloc: g("alloc"), scan: g("scan") });
-      ratio("pcs_per_wearer", "Garments per wearer", "pieces", "alloc / w", { alloc: g("alloc"), w: g("wearers") });
+      ratio("pcs_per_wearer", "Garments per wearer", "garments/wearer", "alloc / w", { alloc: g("alloc"), w: g("wearers") });
       ratio("req_per_1k", "Service requests per 1 000 wearers", "requests", "req / w * 1000", { req: g("req"), w: g("wearers") });
       ratio("on_time_pct", "Cycles on time", "%", "(n - late) / n * 100", { n: g("cyc"), late: g("late") });
       ratio("avg_cycle_h", "Average cycle time", "hours", "h / n", { h: g("cych"), n: g("cyc") });
       ratio("rep_per_100", "Repairs per 100 wearers", "repairs", "rep / w * 100", { rep: g("rep"), w: g("wearers") });
+      ratio("a_co2", "Emissions allocated (process + delivery)", "kgCO2e", "p + d", { p: g("a_proc"), d: g("a_deliv") }, "allocated");
+      ratio("water_per_kg", "Fresh water per washed kg", "l/kg", "w / kg", { w: g("a_water"), kg: g("kg") }, "allocated");
       ratio("w_total", "Textile waste attributed", "kg", "a + b + c + d", { a: g("w_rec"), b: g("w_reuse"), c: g("w_erec"), d: g("w_inc") }, "allocated");
       ratio("w_div_pct", "Textile waste kept out of incineration", "%", "(a + b + c) / (a + b + c + d) * 100", { a: g("w_rec"), b: g("w_reuse"), c: g("w_erec"), d: g("w_inc") }, "allocated");
       for (const b of BASELINE_IDS) {
@@ -633,6 +635,19 @@ export function buildPackLedger(pack: Pack, customerId: string): PackLedger {
           put("sav_co2_pct", "Emission saving vs. alternative", key, scope, period, "%", { formula: "s / c * 100", bindings: { s: g("sav_co2", v), c: g("cmp_co2", v) } }, opt);
         }
       }
+    }
+  }
+
+  // Garments above what the customer's own average utilisation would need at each site.
+  for (const period of allPeriods) {
+    const u = mid("util_pct", customerId, period);
+    for (const s of siteIds) {
+      put("excess_pieces", "Garments above customer-average utilisation", s, siteScope(s), period, "pieces", { formula: "max(0, alloc - scan * 100 / u)", bindings: { alloc: mid("alloc", s, period), scan: mid("scan", s, period), u } }, { status: "calculated" });
+    }
+    put("excess_pieces", "Garments above customer-average utilisation", customerId, cust, period, "pieces", sumF([...siteIds].map((s) => mid("excess_pieces", s, period))), { status: "calculated" });
+    for (const t of repairTypes) {
+      const k = `${customerId}.${slug(t)}`;
+      put("rep_t_share", `Share of repairs: ${t}`, k, { ...cust, slice: t }, period, "%", { formula: "t / all * 100", bindings: { t: mid("rep_t", k, period), all: mid("rep", customerId, period) } }, { status: "calculated" });
     }
   }
 
