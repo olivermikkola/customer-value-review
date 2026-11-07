@@ -1,9 +1,7 @@
 /**
  * Small multilingual embedding models that run in the browser (transformers.js,
- * ONNX). Measured with scripts/ask-eval.ts on 40 questions another model
- * wrote without seeing the word lists (right fact first / right fact anywhere
- * in the answer): word lists alone 27 / 33, + e5-small 29 / 33,
- * + EmbeddingGemma 30 / 35. EmbeddingGemma is the default.
+ * ONNX). The dashboard uses bge-small; scripts/answer-eval.ts compares the
+ * available models on the English question fixtures.
  */
 export const DEFAULT_EMBEDDER = "embeddinggemma";
 export interface EmbedderSpec {

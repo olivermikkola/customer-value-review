@@ -6,6 +6,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+const port = process.env.PORT ?? "5173";
 const profile = mkdtempSync(join(tmpdir(), "lanka-offline-"));
 const browser = await chromium.launchPersistentContext(profile, {
   executablePath: process.env.CHROME ?? "/usr/bin/google-chrome",
@@ -20,20 +21,34 @@ await browser.route("**/*", (route) => {
   blocked.push(u.href);
   return route.abort();
 });
-const page = await browser.newPage();
-const t0 = Date.now();
-await page.goto("http://localhost:5173/legacy");
-await page.waitForFunction(() => /valmiina|epäonnistui|Virhe/.test(document.getElementById("edgeStatus").textContent), null, {
-  timeout: 180000,
-});
-console.log(`model ready ${((Date.now() - t0) / 1000).toFixed(1)} s (fresh profile):`, await page.textContent("#edgeStatus"));
-const semantic = await page.evaluate(() => import("/semantic.js").then((m) => m.loadSemantic()).then((s) => (s ? "loaded" : window.__semanticError)));
-console.log("embedding model:", semantic);
-const run = await page.evaluate(() => window.__edgeAnswer("Miten vedenkulutus käyttäytyi joulukuussa?"));
-console.log(`answer (${run.routing}, ${run.s} s):`, run.sentences.map((s) => s.text).join(" "));
-const none = await page.evaluate(() => window.__edgeAnswer("Toimitetaanko vaatteet ajallaan?"));
-console.log(`no-data answer: ${none.noData} → module: ${none.module}`);
-await page.locator(".askbar").screenshot({ path: "/tmp/lanka-module.png" });
-console.log(blocked.length ? `BLOCKED ${blocked.length} external requests:\n  ${[...new Set(blocked)].join("\n  ")}` : "no external requests");
-await browser.close();
-rmSync(profile, { recursive: true, force: true });
+try {
+  const page = await browser.newPage();
+  const t0 = Date.now();
+  await page.goto(`http://localhost:${port}/`);
+  await page.waitForSelector(".kpi");
+  await page.waitForFunction(() => /is ready|Could not load|Error:/.test(document.getElementById("aiStatus").textContent), null, {
+    timeout: 180000,
+  });
+  const status = await page.textContent("#aiStatus");
+  console.log(`model ready ${((Date.now() - t0) / 1000).toFixed(1)} s (fresh profile):`, status);
+  if (!status.includes("is ready")) throw new Error("The on-device model did not load offline");
+  const meaning = await page.evaluate(() => import("/intent.js").then(async (m) => {
+    await m.load();
+    return { phase: m.state.phase, error: m.state.error };
+  }));
+  console.log("embedding model:", meaning);
+  if (meaning.phase !== "ready") throw new Error("The meaning model did not load offline");
+  const run = await page.evaluate(() => window.__aiAsk("How much water did we save?"));
+  if (!run?.sentences?.length) throw new Error("The on-device answer did not complete");
+  console.log(`answer (${run.s} s):`, run.sentences.map((s) => s.text).join(" "));
+  const none = await page.evaluate(() => window.__aiAsk("How do we compare with other customers?"));
+  if (!none?.noData?.module) throw new Error("The no-data answer did not name its module");
+  console.log(`no-data answer: ${none.noData.reason} → module: ${none.noData.module.name}`);
+  await page.evaluate(() => window.__submit("How much water did we save?"));
+  await page.locator("#qa").screenshot({ path: "/tmp/cvr-module.png" });
+  console.log(blocked.length ? `BLOCKED ${blocked.length} external requests:\n  ${[...new Set(blocked)].join("\n  ")}` : "no external requests");
+  if (blocked.length) throw new Error("The dashboard attempted external requests");
+} finally {
+  await browser.close();
+  rmSync(profile, { recursive: true, force: true });
+}
