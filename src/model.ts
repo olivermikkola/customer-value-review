@@ -1,5 +1,5 @@
 /**
- * LANKA — provenance model.
+ * Customer Value Review — provenance model.
  *
  * Rule of the whole system: a number shown to a human is always a Claim, and a
  * Claim always points at Measures, and a Measure always points at Sources or

@@ -7,7 +7,7 @@ const port = process.env.PORT ?? "5173";
 const model = process.env.MODEL ?? "4B";
 const customers = (process.env.CUSTOMERS ?? "CUST001,CUST002,CUST003").split(",");
 const priorities = (process.env.PRIORITIES ?? "overview,water,emissions,cost,circularity,service").split(",");
-const browser = await chromium.launchPersistentContext("/tmp/lanka-chrome-profile", {
+const browser = await chromium.launchPersistentContext("/tmp/cvr-chrome-profile", {
   executablePath: process.env.CHROME ?? "/usr/bin/google-chrome",
   headless: true,
   args: ["--enable-unsafe-webgpu", "--enable-features=Vulkan,WebGPU", "--use-angle=vulkan", "--ignore-gpu-blocklist"],
@@ -32,6 +32,6 @@ for (const c of customers) {
     console.error(`${c} ${p}: ${run.modelSentences}/${run.totalSentences} model, ${run.refused} refused, ${run.tokPerS} tok/s`);
   }
 }
-writeFileSync(`/tmp/lanka-review-eval-${model}.json`, JSON.stringify(all, null, 2));
+writeFileSync(`/tmp/cvr-review-eval-${model}.json`, JSON.stringify(all, null, 2));
 console.log(JSON.stringify({ model, runs: customers.length * priorities.length, tasks, tasksWhollyByModel: tasksAllModel, sentences: total, byModel: model_, refused: refusedN, refusedByCode: codes }, null, 2));
 await browser.close();

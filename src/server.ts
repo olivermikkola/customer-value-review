@@ -19,7 +19,7 @@ function parseSims(raw: string | null): Record<string, number> | undefined {
 }
 
 /** The embedding model that reads questions. bge-small: 34 MB, CPU only; see scripts/answer-eval.ts for the comparison. */
-const ANSWER_EMBEDDER = process.env.LANKA_EMBEDDER && EMBEDDERS[process.env.LANKA_EMBEDDER] ? process.env.LANKA_EMBEDDER : "bge-small";
+const ANSWER_EMBEDDER = process.env.CVR_EMBEDDER && EMBEDDERS[process.env.CVR_EMBEDDER] ? process.env.CVR_EMBEDDER : "bge-small";
 
 const WEB = join(import.meta.dirname, "..", "web");
 
@@ -170,5 +170,5 @@ const server = createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`LANKA  →  http://localhost:${PORT}`);
+  console.log(`Customer Value Review  →  http://localhost:${PORT}`);
 });

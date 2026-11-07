@@ -1,7 +1,7 @@
 // One-time setup for an offline demo: puts every model file the page needs in
 // models/ (not in git), so the browser loads nothing from the internet.
 //   npm run models
-// ~1.2 GB: Bonsai 2 4B (0.95 GB), EmbeddingGemma (0.2 GB), ONNX runtime (0.05 GB).
+// ~1.3 GB: Bonsai 2 4B (0.95 GB), bge-small (34 MB), EmbeddingGemma (195 MB), ONNX runtime (50 MB).
 import { createWriteStream, existsSync, mkdirSync, copyFileSync, readdirSync, renameSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { Readable } from "node:stream";
@@ -15,7 +15,7 @@ const BONSAI_URL =
 
 async function download(url: string, to: string): Promise<void> {
   if (existsSync(to)) {
-    console.log(`✓ on jo: ${to} (${(statSync(to).size / 1e6).toFixed(0)} Mt)`);
+    console.log(`✓ already present: ${to} (${(statSync(to).size / 1e6).toFixed(0)} MB)`);
     return;
   }
   mkdirSync(dirname(to), { recursive: true });
@@ -29,13 +29,13 @@ async function download(url: string, to: string): Promise<void> {
     got += c.length;
     if (got - shown > 50e6) {
       shown = got;
-      process.stdout.write(`  ${(got / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} Mt\r`);
+      process.stdout.write(`  ${(got / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB\r`);
     }
   });
   // Write to .part first so an interrupted download is never mistaken for a finished one.
   await pipe(body, createWriteStream(to + ".part"));
   renameSync(to + ".part", to);
-  console.log(`✓ ladattu: ${to} (${(got / 1e6).toFixed(0)} Mt)`);
+  console.log(`✓ downloaded: ${to} (${(got / 1e6).toFixed(0)} MB)`);
 }
 
 
@@ -46,7 +46,7 @@ const light = process.argv.includes("--light");
 if (!light) await download(BONSAI_URL, join(MODELS, LOCAL.bonsai));
 
 // 2. The embedding models: let transformers.js fetch exactly the files it uses, into models/hf/.
-//    bge-small (34 MB) reads the review's questions; EmbeddingGemma (195 MB) is only used by the older demo.
+//    bge-small (34 MB) reads the review's questions; EmbeddingGemma (195 MB) is available for evaluation comparisons.
 env.cacheDir = join(MODELS, LOCAL.hf);
 for (const name of light ? ["bge-small"] : ["bge-small", DEFAULT_EMBEDDER]) {
   const spec = EMBEDDERS[name]!;
@@ -54,8 +54,8 @@ for (const name of light ? ["bge-small"] : ["bge-small", DEFAULT_EMBEDDER]) {
     dtype: spec.dtype as "q4",
     ...(spec.file ? { model_file_name: spec.file } : {}),
   });
-  await extract(["testi"], { pooling: "mean", normalize: true });
-  console.log(`✓ upotusmalli: ${join(MODELS, LOCAL.hf, spec.repo)}`);
+  await extract(["test"], { pooling: "mean", normalize: true });
+  console.log(`✓ embedding model: ${join(MODELS, LOCAL.hf, spec.repo)}`);
 }
 
 // 3. The ONNX runtime's WebAssembly files, the same version transformers.js was built with.
@@ -65,5 +65,5 @@ mkdirSync(ortTo, { recursive: true });
 for (const f of readdirSync(ortDist).filter((f) => /^ort-wasm-simd-threaded.*\.(wasm|mjs)$/.test(f))) {
   copyFileSync(join(ortDist, f), join(ortTo, f));
 }
-console.log(`✓ ONNX-ajonaika: ${ortTo}`);
-console.log("\nValmis. Käynnistä: npm run ui  → http://localhost:5173 (avaa kerran ennen demoa)");
+console.log(`✓ ONNX runtime: ${ortTo}`);
+console.log("\nDone. Start: npm run ui  → http://localhost:5173 (open once before the demo)");

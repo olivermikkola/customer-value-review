@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const port = process.env.PORT ?? "5173";
-const profile = mkdtempSync(join(tmpdir(), "lanka-offline-"));
+const profile = mkdtempSync(join(tmpdir(), "cvr-offline-"));
 const browser = await chromium.launchPersistentContext(profile, {
   executablePath: process.env.CHROME ?? "/usr/bin/google-chrome",
   headless: true,

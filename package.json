@@ -1,9 +1,9 @@
 {
-  "name": "lanka",
+  "name": "customer-value-review",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "LANKA — elävä asiakaskatsaus. Todisteketju operatiivisista tapahtumista asiakkaalle näkyviin väitteisiin.",
+  "description": "Customer Value Review for the Lindström challenge at Since AI Hackathon 2026: traceable customer value and sustainability analytics.",
   "scripts": {
     "verify": "node src/pack/cli.ts",
     "ui": "node src/server.ts",

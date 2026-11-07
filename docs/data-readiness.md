@@ -23,7 +23,7 @@ The pack README says which Lindström reports each sheet's *structure* was infor
 
 ## 2. How the prototype is built to take real data
 
-- The pack path is one setting: `LANKA_PACK=/path/to/export.xlsx npm run ui`. Sheet and column names are validated on load; a missing sheet or column stops the load with a clear message, and a non-numeric cell names its row.
+- The pack path is one setting: `CVR_PACK=/path/to/export.xlsx npm run ui`. Sheet and column names are validated on load; a missing sheet or column stops the load with a clear message, and a non-numeric cell names its row.
 - Every source keeps its sheet and cell, so a real export can be traced the same way.
 - Unmapped rows (a site or product not in master data) are counted and shown, not dropped.
 - Real exports from Tableau, Power BI, Excel or eLindström would be mapped to the same column names by a small adapter; the measures, observations, dashboard and deck would not change.
