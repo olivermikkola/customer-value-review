@@ -410,7 +410,6 @@ function observe(v: CustomerView, R: Reader, L: PackLedger, p: Params): Observat
       top.push(s);
       acc += s.m.excess_pieces!.value;
     }
-    const topSum = acc;
     const names = top.map((s) => short(s.name));
     const nameList = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : (names[0] ?? "");
     if (totalExcess.value > 0) {
@@ -418,7 +417,7 @@ function observe(v: CustomerView, R: Reader, L: PackLedger, p: Params): Observat
         id: "obs:allocation",
         theme: "cost",
         tone: "act",
-        headline: `${nameList} ${names.length > 1 ? "hold" : "holds"} ${pct((topSum / totalExcess.value) * 100)} of the surplus garments`,
+        headline: `${nameList} ${names.length > 1 ? "hold" : "holds"} the most surplus garments (${top.map((t) => t.m.excess_pieces!.display).join(", ")} of ${totalExcess.display})`,
         detail: `Customer-wide, ${avg("util_pct").display} of allocated garments are scanned in use. Against that average, about ${totalExcess.display} garments are allocated above need, concentrated at ${top.length} sites.`,
         evidence: [ev("Customer utilisation", avg("util_pct")), ev("Surplus garments, customer", totalExcess), ...top.map((s) => ev(`Surplus at ${s.name}`, s.m.excess_pieces!))],
         discuss: `Which of the ${top.length} sites with the most surplus garments can reduce their allocation without hurting availability?`,
@@ -459,7 +458,7 @@ function observe(v: CustomerView, R: Reader, L: PackLedger, p: Params): Observat
       tone: "good",
       headline: `Estimated ${s.display} less fresh water than ${alt} (${sp.display})`,
       detail: `Range across assumptions: ${R.cell("sav_water", cid, per, lo).display} to ${R.cell("sav_water", cid, per, hi).display}. Water use per washed kg differs by laundry: ${loW.m.water_per_kg!.display} at ${loW.name} against ${hiW.m.water_per_kg!.display} at ${hiW.name}.`,
-      evidence: [ev("Water saved (selected case)", s), ev("Low case", R.cell("sav_water", cid, per, lo)), ev("High case", R.cell("sav_water", cid, per, hi)), ev(`Water per kg, ${hiW.name}`, hiW.m.water_per_kg!), ev(`Water per kg, ${loW.name}`, loW.m.water_per_kg!)],
+      evidence: [ev("Water saved (selected case)", s), ev("Water saving as a share of the alternative", sp), ev("Low case", R.cell("sav_water", cid, per, lo)), ev("High case", R.cell("sav_water", cid, per, hi)), ev(`Water per kg, ${hiW.name}`, hiW.m.water_per_kg!), ev(`Water per kg, ${loW.name}`, loW.m.water_per_kg!)],
       discuss: "Is this the right comparison for your own laundry situation, and which baseline would you trust in an internal report?",
       action: { title: "Agree the comparison baseline and ask the laundries serving the highest-use sites for a water-efficiency plan", effort: "medium" },
       caveat: "Water is laundry-level and allocated by washed-kg share; the alternative is an illustrative per-kg value with a prototype ±20 % band.",

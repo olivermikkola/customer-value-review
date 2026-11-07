@@ -9,7 +9,7 @@ import { TOPICS } from "./topics.ts";
 import { DEFAULT_EMBEDDER, EMBEDDERS } from "./embedders.ts";
 import type { Lens } from "./review.ts";
 import { LOCAL, MODELS } from "./local.ts";
-import { deck as packDeck, ask as packAsk, loadAll, meta as packMeta, trace as packTrace, view as packView } from "./pack/api.ts";
+import { answer as packAnswer, gate as packGate, narrate as packNarrate, deck as packDeck, ask as packAsk, loadAll, meta as packMeta, trace as packTrace, view as packView } from "./pack/api.ts";
 
 const pack = await loadAll();
 
@@ -65,6 +65,21 @@ const MIME: Record<string, string> = {
 const server = createServer((req, res) => {
   const url = new URL(req.url ?? "/", "http://localhost");
 
+  if (url.pathname === "/api/gate" && req.method === "POST") {
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      try {
+        const out = packGate(pack, JSON.parse(body));
+        res.writeHead(out ? 200 : 404, { "content-type": MIME[".json"]!, "cache-control": "no-store" });
+        res.end(JSON.stringify(out ?? { error: "unknown task" }));
+      } catch {
+        res.writeHead(400).end("bad json");
+      }
+    });
+    return;
+  }
+
   if (url.pathname === "/api/export.pptx") {
     packDeck(pack, url.searchParams.get("customer") ?? "CUST001", url.searchParams).then(
       (d) => {
@@ -87,6 +102,8 @@ const server = createServer((req, res) => {
       url.pathname === "/api/meta" ? packMeta(pack)
       : url.pathname === "/api/view" ? packView(pack, customer, url.searchParams)
       : url.pathname === "/api/ask" ? packAsk(pack, customer, (url.searchParams.get("q") ?? "").slice(0, 300))
+      : url.pathname === "/api/narrate" ? packNarrate(pack, customer, url.searchParams)
+      : url.pathname === "/api/answer" ? packAnswer(pack, customer, (url.searchParams.get("q") ?? "").slice(0, 300), url.searchParams)
       : url.pathname === "/api/trace" ? packTrace(pack, customer, url.searchParams.get("measure") ?? "")
       : undefined;
     if (out === undefined) return json(404, { error: "unknown endpoint" });
