@@ -24,3 +24,8 @@ for (const [m, variant] of [["wearers"], ["alloc"], ["scan"], ["util_pct"], ["kg
 }
 console.log("reconciliation against the pack's own Customer_Impacts:");
 for (const r of L.reconciliation) console.log(`  ${r.check.padEnd(52)} ours ${r.ours.toFixed(1).padStart(14)}  pack ${r.pack.toFixed(1).padStart(14)}  diff ${(r.relDiff * 100).toFixed(4)} %`);
+
+// Match the pack tests' 0.1% tolerance for the workbook's rounded figures.
+const mismatches = L.reconciliation.filter((r) => !(r.relDiff < 0.001));
+console.log(`${bad} failed recomputations · ${mismatches.length} reconciliation mismatches (tolerance 0.1%)`);
+if (bad || mismatches.length) process.exitCode = 1;
