@@ -44,7 +44,55 @@ export interface AskTask extends SentenceTask {
   open: Record<string, string>;
 }
 
-export type AskResult = { task: AskTask; matched: string[] } | { task: null; reason: string };
+/**
+ * Lindström's own add-on modules, named exactly as in their example dashboard
+ * (Lindstrom_Managerial_dashboard.pdf). When this review has no data for a
+ * question, the honest "no" names the module that would answer it.
+ */
+export interface Module {
+  name: string;
+  covers: string;
+}
+
+const MODULES: { module: Module; stems: string[] }[] = [
+  {
+    module: {
+      name: "Transparency & control",
+      covers: "tilaus- ja toimitustila, palautus- ja pesukierron seuranta, ennakoivat ilmoitukset",
+    },
+    stems: ["toimitu", "toimite", "toimita", "ajallaan", "myöhä", "viiväs", "viive", "kuljetu", "tilau", "tilaus", "palautu", "seuranta", "seurata"],
+  },
+  {
+    module: {
+      name: "Predictive & AI-assisted insights",
+      covers: "kysynnän ennustaminen, poikkeavan kulumisen ja hävikin tunnistus, toimitusten ennakointi",
+    },
+    stems: ["ennust", "ennakoi", "ensi kuu", "ensi kvartaal", "ensi vuon", "tulevai", "tulevan", "kulumi", "suunnitel"],
+  },
+  {
+    module: {
+      name: "Sustainability & compliance intelligence",
+      covers: "ESG-raportointi, materiaalien jäljitettävyys, auditointivalmis näyttö",
+    },
+    stems: ["esg", "csrd", "auditoin", "audit", "jäljitet", "materiaali", "alkuperä", "kierrätettyä", "kierrätysmateriaali", "sertifi"],
+  },
+];
+
+const BENCHMARKING: Module = {
+  name: "Performance reporting & benchmarking",
+  covers: "KPI:t toimipisteittäin ja rooleittain, toimialan vertailuluvut, ROI- ja tehokkuusmittarit",
+};
+
+/** The module that would answer a question this review cannot, if one fits. */
+export function moduleFor(question: string): Module | undefined {
+  const q = ` ${question.toLowerCase()} `;
+  if (COMPARE_RE.test(q)) return BENCHMARKING;
+  return MODULES.find((m) => m.stems.some((s) => q.includes(s)))?.module;
+}
+
+export type AskResult =
+  | { task: AskTask; matched: string[] }
+  | { task: null; reason: string; module?: Module };
 
 /** Longer matched stems weigh more: "säästettiin" is about savings before it is about water. */
 function hits(q: string, stems: string[]): number {
@@ -116,13 +164,18 @@ export function askTask(
       reason:
         "Vertailuun muihin asiakkaisiin ei ole todennettua dataa tässä katsauksessa. " +
         "Se vaatii useamman asiakkaan vertaisdatan, eikä sitä arvata.",
+      module: BENCHMARKING,
     };
   }
   if (m.claimIds.length === 0) {
-    return {
-      task: null,
-      reason: "Tähän kysymykseen ei löytynyt todennettua lukua tästä katsauksesta. Kokeile esim. vettä, katoamisia, laskutusta tai päästöjä.",
-    };
+    const module = moduleFor(question);
+    return module
+      ? { task: null, reason: "Tähän kysymykseen ei ole todennettua dataa tässä katsauksessa.", module }
+      : {
+          task: null,
+          reason:
+            "Tähän kysymykseen ei löytynyt todennettua lukua tästä katsauksesta. Kokeile esim. vettä, katoamisia, laskutusta tai päästöjä.",
+        };
   }
 
   const claimIds = [...m.claimIds];

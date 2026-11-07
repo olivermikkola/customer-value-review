@@ -27,17 +27,23 @@ function status(text) {
 let loading = null;
 let busy = false;
 
+/** Model files the server has locally (npm run models); null entries mean "use the internet". */
+export const local = fetch("/local")
+  .then((r) => r.json())
+  .catch(() => ({}));
+
 function load() {
   const mb = (n) => (n / 1e6).toFixed(0);
-  loading ??= Bonsai.load({
-    model: MODELS[size],
+  loading ??= local.then((where) => Bonsai.load({
+    // The 4B weights from this server when present: the demo then needs no network at all.
+    model: size === "4B" && where.bonsai ? where.bonsai : MODELS[size],
     cache: true,
     onProgress: (p) => {
       if (busy) return;
       if (p.stage === "weights") status(`Ladataan mallia taustalla ${mb(p.loaded)} / ${mb(p.total)} Mt`);
       else if (p.stage === "compile") status(`Valmistellaan mallia ${p.done}/${p.total}`);
     },
-  }).then(
+  })).then(
     (engine) => {
       if (!busy) status(`${MODEL_NAME} valmiina tässä selaimessa. Kirjoita katsaus tai kysy alla.`);
       return engine;
@@ -217,9 +223,20 @@ export function answer(question) {
     const res = await fetch(`/ask?q=${encodeURIComponent(question)}${simsParam}`).then((r) => r.json());
 
     if (!res.task) {
-      host.className = "answer bad";
-      host.replaceChildren(Object.assign(document.createElement("p"), { textContent: res.reason }));
-      return { question, routing: sims ? "semantic" : "words", sentences: [], rejected: [], noData: res.reason, s: +((performance.now() - t0) / 1000).toFixed(1) };
+      host.className = res.module ? "answer info" : "answer bad";
+      const parts = [Object.assign(document.createElement("p"), { textContent: res.reason })];
+      if (res.module) {
+        // The honest "no" names the add-on module that would answer it (Lindström's own module names).
+        const card = document.createElement("div");
+        card.className = "module-card";
+        const name = Object.assign(document.createElement("strong"), { textContent: res.module.name });
+        const tag = Object.assign(document.createElement("span"), { className: "module-tag", textContent: "Lisämoduuli" });
+        const covers = Object.assign(document.createElement("p"), { textContent: `Vastaisi tähän: ${res.module.covers}.` });
+        card.append(tag, " ", name, covers);
+        parts.push(card);
+      }
+      host.replaceChildren(...parts);
+      return { question, routing: sims ? "semantic" : "words", sentences: [], rejected: [], noData: res.reason, module: res.module?.name ?? null, s: +((performance.now() - t0) / 1000).toFixed(1) };
     }
 
     host.replaceChildren(

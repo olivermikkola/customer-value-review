@@ -113,6 +113,18 @@ node scripts/edge-run.mjs balanced 4B       # sama headless-Chromessa, tulostaa 
 npm run write                               # sama silmukka palvelimella (OpenAI-yhteensopiva, LLM_URL/LLM_MODEL)
 ```
 
+**Ilman nettiä (demo):** `npm run models` lataa kerran kaikki mallit kansioon
+`models/` (~1,2 Gt, ei gitissä), ja palvelin jakaa ne itse. Sivu ei silloin hae mitään
+internetistä — todistettu `node scripts/offline-check.mjs`: tyhjä selainprofiili, kaikki
+localhostin ulkopuoliset pyynnöt estetty. **WebGPU toimii vain `localhost`issa tai HTTPS:llä**,
+joten demo ajetaan esityskoneella itsellään, ei toisen koneen osoitteesta.
+
+**Kun dataa ei ole:** vastaus kertoo rehellisesti "ei todennettua dataa" ja nimeää
+Lindströmin oman lisämoduulin, joka vastaisi (nimet heidän esimerkkidashboardistaan):
+toimitukset → *Transparency & control*, vertailu → *Performance reporting & benchmarking*,
+ennusteet → *Predictive & AI-assisted insights*, ESG/auditointi → *Sustainability &
+compliance intelligence*. Jos mikään ei sovi, moduulia ei keksitä.
+
 Moottorin päivitys: `npx esbuild <Talk>/kernels.ts --bundle --format=esm --minify --outfile=web/vendor/bonsai.js`.
 
 ## Linssit
