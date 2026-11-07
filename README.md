@@ -1,18 +1,84 @@
-# Customer Value Review (Since AI Hackathon 2026, Lindström challenge)
+# Customer Value Review
 
-A customer-level value and sustainability review for a fictional multi-site customer, built on the
-official synthetic data pack. **All data is synthetic; nothing here is audited or real Lindström performance.**
+**Every number in a Lindström customer review opens its proof, and the customer-ready deck is one click away.**
+
+Since AI Hackathon 2026, Lindström challenge: *Customer Value & Sustainability Review Generator*.
+
+- **Try it:** https://moesystems.com/demos/lindstrom (runs in the browser; the on-device AI needs a WebGPU browser such as Chrome or Edge)
+- **Watch:** [2-minute demo video](https://moesystems.com/demos/lindstrom/Customer_Value_Review_demo.mp4)
+- **Read:** [pitch deck (PDF)](https://moesystems.com/demos/lindstrom/Customer_Value_Review_pitch.pdf) · [pilot and continuation plan (PDF)](https://moesystems.com/demos/lindstrom/Customer_Value_Review_pilot_plan.pdf) · [methodology](docs/methodology.md) · [data readiness](docs/data-readiness.md)
+
+> All data comes from the official synthetic data pack. Nothing here is real or audited Lindström or customer performance, and every figure is labelled as such.
+
+![The review for NorthStar Foods Group](docs/img/dash.jpg)
+
+## The problem
+
+Every customer asks Lindström one question: *what value did you actually create for us?* Answering it takes days of spreadsheets, and then the customer has to take the numbers on trust. It isn't a reporting problem. It's a proof problem.
+
+## What it does
+
+| Lindström's brief | In Customer Value Review |
+|---|---|
+| **Traceable calculations** | Every figure opens its evidence: formula, inputs, quarters, sites, down to the exact cell and assumption in the data pack. On start the app recomputes all ~22,000 measures and refuses to start if one doesn't match. Our totals match the pack's own `Customer_Impacts` sheet within 0.05 %. |
+| **Personalised analytics** | The customer's industry sets the starting priority (food: hygiene, water, reliability). Priority, period, comparison and free text reorder the review. The numbers never change. |
+| **Decision support** | Rules rank the findings; each ends in a question for the meeting, an action to agree on, and its limits. Water, energy and emissions against the realistic alternative, with low / base / high ranges. |
+| **Interfaces** | Dashboard with site drill-down, a plain-English question box, and a customer-ready PowerPoint in one click from the same figures. |
+
+<table><tr>
+<td width="38%"><img src="docs/img/evidence-drawer.jpg" alt="Evidence drawer"><br><sub>Every figure opens its formula and inputs, recomputed live.</sub></td>
+<td><img src="docs/img/ainote-crop.jpg" alt="On-device AI meeting note"><br><sub>The meeting note, drafted by a model running in the browser. Every figure links to its proof.</sub></td>
+</tr></table>
+
+## On-device AI that cannot invent a figure
+
+A small language model (Ternary Bonsai 2, 4B, WebGPU) runs **in the browser on the account manager's own computer** and drafts the three-sentence note that opens the meeting. Customer data never leaves the device.
+
+```
+rules pick the findings and supply every figure
+   → the model only writes
+   → checker (src/pack/narrate.ts) blocks: a figure it wasn't given, an estimate not called one,
+     a causal claim, an overclaim, a site outside the facts
+   → page: every figure links to its evidence; after two failures the rules-written sentence is shown, marked "Rules"
+```
+
+Measured with `scripts/review-ai-eval.mjs` (3 customers × 3 priorities, Radeon 890M, ~23 tokens/s): **96 of 98** model-written sentences passed. The two it stopped had used an estimate without saying so.
+
+Questions in the question box are answered **without** a generative model: a small embedding model (bge-small, CPU) picks one of ~25 intents, and the answer is composed from the review's own figures with links to the evidence. Questions the data can't answer (prices, forecasts, other customers, causes) are refused honestly, naming the Lindström module that would answer them. On 39 blind questions: 77 % right intent, vs. 56 % for keywords alone (`scripts/answer-eval.ts`).
+
+## Run it
+
+Node 22.18 or newer.
 
 ```bash
 npm install
-npm run ui        # http://localhost:5173  (reads data/pack/*.xlsx, refuses to start if any number fails to recompute)
-npm run pack      # prints NorthStar's headline numbers and reconciles them with the pack's own Customer_Impacts sheet
-npm run check     # typecheck + tests + verify
+npm run ui        # http://localhost:5173 — refuses to start if any figure fails to recompute
+npm run check     # typecheck + 70 tests + verify (recompute everything, reconcile with the pack)
+npm run pack      # NorthStar's headline figures and the reconciliation table
+npm run static    # server-less build into site/
+npm run models    # download the model weights once, for a fully offline demo
 ```
 
-- `src/pack/` reads the xlsx, builds the verifiable ledger (Excel cell → source → measure → site → customer), the view model and the rule-generated observations.
-- `web/index.html` is the dashboard. Every figure opens its evidence chain; every figure carries a status (synthetic, calculated, allocated, estimated).
-- To use an approved export instead of the synthetic pack: `CVR_PACK=/path/to/export.xlsx npm run ui` (same sheet and column names).
-- **Ask this review (any modern browser, no GPU).** The question box understands a question and answers it from the figures. `src/pack/answer.ts` holds about 25 intents (topics the review covers, forms such as "which site is worst", and things the data cannot answer, each with the module that would). A small embedding model in the browser (`web/intent.js`, bge-small, 34 MB, CPU only) scores how close the question is to each intent's example phrasings; word patterns and entity detection (sites without accents, Q1-Q4, baseline, "worst/best") are added to that. The answer is composed from the view's own cells, so every figure links to its ledger evidence, the same question gives the same answer, and nothing is generated. A question that matches nothing well gets "not sure" and real questions to try; each answer shows how it was read and lets the reader choose another reading. Without the model it falls back to keywords. Measured with `scripts/answer-eval.ts` on 39 questions written after tuning and not used for it: right intent 77% with the model vs 56% on keywords alone, ; of the 9 misses, 3 asked the reader to rephrase, 2 gave a neighbouring answer, 2 were refused but could have been answered, and 2 were answered but should have been refused (a price and a forecast question). With a CPU slowed 6x, the model is ready in 14 s and a question takes 0.25 s.
-- **On-device AI (optional, WebGPU).** `web/narrate.js` runs a small model (Ternary Bonsai 2) in the browser. It drafts a three-sentence note that opens the meeting (rules pick one finding that went well, one that needs attention and its proposed action; the model turns them into a message to the customer) and words each finding in plain language. It never computes: it is handed finished figures and may only restate them. Measured with `scripts/review-ai-eval.mjs` (4B, 3 customers × 3 priorities, Radeon 890M, about 23 tokens/s): 96 of 98 sentences written by the model passed the checker; the 2 refused used an estimated figure without calling it an estimate. `src/pack/narrate.ts` is the checker: every figure must be one it was given, an estimate must be called an estimate, and causes, overclaims, copied fact layouts and sites outside the facts are refused. After a refused answer the model gets one retry; after that the rules-written sentence is shown, marked "Rules". Without WebGPU everything else still works, including the question box above. `npm run models` downloads the weights once for offline demos; `npm run models -- --light` fetches only the question model (about 90 MB).
-  - `node scripts/review-ai-run.mjs write CUST001 water` and `... ask "question"` run the real model in headless Chrome (`PORT=… npm run ui` first); `node scripts/review-ai-eval.mjs` measures acceptance across every customer and priority.
+Use an approved export instead of the synthetic pack: `CVR_PACK=/path/to/export.xlsx npm run ui` (same sheet and column names; missing sheets or columns stop the load with a clear message, unmapped rows are counted, not dropped).
+
+## How it is built
+
+TypeScript on Node 22, no framework.
+
+```
+src/pack/read.ts      xlsx → typed rows (ExcelJS), every value keeps its sheet and cell
+src/pack/build.ts     ledger: Excel cell → source → site-month → site/customer, quarter/year; footprint and handprint
+src/ledger.ts         measures with formulas; recompute and compare (1e-9)
+src/pack/view.ts      the customer view: priorities, findings, comparisons, status labels
+src/pack/answer.ts    question intents and honest refusals
+src/pack/narrate.ts   the checker for model-written sentences
+src/pack/deck.ts      the PowerPoint (PptxGenJS), speaker notes name each figure's measure
+src/server.ts         zero-dependency HTTP server; src/static/ builds the same app without a server
+web/                  dashboard (index.html, dashboard.js), intent.js (embeddings), narrate.js (WebGPU model)
+```
+
+Status labels: **Synthetic** (summed from the pack), **Calculated** (ratios of those), **Allocated** (laundry figure shared by washed kg), **Estimated** (depends on an assumption). A result takes the least certain label of its inputs, so an estimate can never pass as a measurement. Details in [docs/methodology.md](docs/methodology.md); what real data would need, field by field, in [docs/data-readiness.md](docs/data-readiness.md).
+
+## Credits
+
+Ternary Bonsai 2 by PrismML and its WebGPU engine (Apache-2.0, see `web/vendor/BONSAI-*`); Transformers.js by Hugging Face (Apache-2.0); PptxGenJS; ExcelJS. Demo narration voiced with ElevenLabs.
