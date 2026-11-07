@@ -39,7 +39,7 @@ Customers ask Lindström for proof of the value of their textile service. We tur
 | Where does water per customer come from? | Laundry totals shared by washed-kg share. Not metered per customer; stated on the page. |
 | What does one repair avoid? | The pack assumes one postponed replacement. We test half of that and show both. |
 | Why no cost saving? | The pack has no prices. We show garment capital tied up in unused allocation and say so. |
-| Is AI involved? | Not in the numbers. Personalisation and observations are rules, so the same input always gives the same view. |
+| Is AI involved? | Not in the numbers. Personalisation and observations are rules, so the same input always gives the same view. A small model on the device reads the question box (34 MB, no GPU, no cloud); the answers are composed from the same figures, with evidence. An optional language model only rewrites findings, and a checker refuses anything it was not given. |
 
 ## Before presenting
 
