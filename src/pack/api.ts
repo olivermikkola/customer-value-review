@@ -17,7 +17,11 @@ export interface Loaded {
 }
 
 export async function loadAll(file = PACK_FILE): Promise<Loaded> {
-  const pack = await readPack(file);
+  return loadFromPack(await readPack(file));
+}
+
+/** Builds and checks every customer's ledger from an already-read pack (also what the static site does in the browser). */
+export function loadFromPack(pack: Pack): Loaded {
   const ledgers = new Map<string, PackLedger>();
   for (const c of pack.customers) {
     const L = buildPackLedger(pack, str(c, "customer_id"));

@@ -212,5 +212,7 @@ export function buildDeck(v: CustomerView): Promise<Buffer> {
     s.addText(v.gaps.map((g) => ({ text: `${g.severity.toUpperCase()}  ${g.text}`, options: { bullet: false, breakLine: true } })), { x: 6.9, y: 1.95, w: 5.8, h: 4.8, fontFace: FONT, fontSize: 10, color: C.ink2, valign: "top", paraSpaceAfter: 5, fit: "shrink" });
   }
 
-  return p.write({ outputType: "nodebuffer" }) as Promise<Buffer>;
+  // Node gives a Buffer; in the browser (static site) a Uint8Array, which is what a download needs.
+  const node = typeof process !== "undefined" && !!process.versions?.node;
+  return p.write({ outputType: node ? "nodebuffer" : "uint8array" }) as Promise<Buffer>;
 }
