@@ -142,15 +142,15 @@ const SITE_METRIC_LABEL: Record<string, string> = {
   rep_per_100: "repairs per 100 wearers", excess_pieces: "garments above average need", unused_cost: "capital in unscanned garments",
 };
 
-const NO_DATA: { re: RegExp; reason: string; module?: Module }[] = [
-  { re: /\b(why|what caused|what is causing|reason for|root cause)\b/i, reason: "The data records what happened, not why. This review cannot give causes; the observations list questions to ask instead." },
-  { re: /\b(did|have|has)\b.{0,30}\b(go (up|down)|fall|fell|drop(ped)?|rise|rose|increase[d]?|decrease[d]?|improve[d]?|fix(ed)?|chang(e|ed)|better|worse)\b|\b(last year|previous year|year[- ]on[- ]year|since last|over time|trend)\b/i, reason: "This review covers 2025 only, so it cannot say whether something improved, changed or was fixed. The quarterly charts show the course through the year." },
-  { re: /\b(price|prices|invoice|invoices|billing|bill|quote|contract|pay|paying|payment|payments|paid)\b/i, reason: "This review has no prices, invoices or contract data, so it cannot answer that." },
-  { re: /\b(benchmark|benchmarks|other customers|peers|industry average|compared (to|with) (other|similar)|better than (others|average))\b/i, reason: "There is no data on other customers in this review, so no comparison with them is possible.", module: MODULES.benchmarking },
-  { re: /\b(forecast|predict|prediction|projection|will we|going to be|expected next)\w*/i, reason: "This review looks back at the period; it contains no forecasts.", module: MODULES.predictive },
-  { re: /\b(esg|csrd|audit|audited|certif\w*|traceab\w*|origin of|recycled material)\b/i, reason: "This prototype is not audit-ready and holds no material traceability data.", module: MODULES.compliance },
-  { re: /\b(order|orders|ordering|tracking|track my|where is|shipment|delivery status)\b/i, reason: "Orders and live delivery status are not part of this review.", module: MODULES.transparency },
-  { re: /\b(contact|phone|email|logo|complaint|complaints|quality of|account manager)\b/i, reason: "That is not something the data in this review covers." },
+export const NO_DATA: { id: string; re: RegExp; reason: string; module?: Module }[] = [
+  { id: "why", re: /\b(why|what caused|what is causing|reason for|root cause)\b/i, reason: "The data records what happened, not why. This review cannot give causes; the observations list questions to ask instead." },
+  { id: "change", re: /\b(did|have|has)\b.{0,30}\b(go (up|down)|fall|fell|drop(ped)?|rise|rose|increase[d]?|decrease[d]?|improve[d]?|fix(ed)?|chang(e|ed)|better|worse)\b|\b(last year|previous year|year[- ]on[- ]year|since last|over time|trend)\b/i, reason: "This review covers 2025 only, so it cannot say whether something improved, changed or was fixed. The quarterly charts show the course through the year." },
+  { id: "price", re: /\b(price|prices|invoice|invoices|billing|bill|quote|contract|pay|paying|payment|payments|paid)\b/i, reason: "This review has no prices, invoices or contract data, so it cannot answer that." },
+  { id: "benchmark", re: /\b(benchmark|benchmarks|other customers|peers|industry average|compared (to|with) (other|similar)|better than (others|average))\b/i, reason: "There is no data on other customers in this review, so no comparison with them is possible.", module: MODULES.benchmarking },
+  { id: "forecast", re: /\b(forecast|predict|prediction|projection|will we|going to be|expected next)\w*/i, reason: "This review looks back at the period; it contains no forecasts.", module: MODULES.predictive },
+  { id: "compliance", re: /\b(esg|csrd|audit|audited|certif\w*|traceab\w*|origin of|recycled material)\b/i, reason: "This prototype is not audit-ready and holds no material traceability data.", module: MODULES.compliance },
+  { id: "orders", re: /\b(order|orders|ordering|tracking|track my|where is|shipment|delivery status)\b/i, reason: "Orders and live delivery status are not part of this review.", module: MODULES.transparency },
+  { id: "other", re: /\b(contact|phone|email|logo|complaint|complaints|quality of|account manager)\b/i, reason: "That is not something the data in this review covers." },
 ];
 
 export type Routed = { noData: { reason: string; module?: Module } } | { task: Task };

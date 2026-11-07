@@ -39,18 +39,24 @@ async function download(url: string, to: string): Promise<void> {
 }
 
 
-// 1. The language model, read by the browser in byte ranges.
-await download(BONSAI_URL, join(MODELS, LOCAL.bonsai));
+// --light: only what the question answering needs (~90 MB), for machines that cannot run the language model anyway.
+const light = process.argv.includes("--light");
 
-// 2. The embedding model: let transformers.js fetch exactly the files it uses, into models/hf/.
-const spec = EMBEDDERS[DEFAULT_EMBEDDER]!;
+// 1. The language model, read by the browser in byte ranges.
+if (!light) await download(BONSAI_URL, join(MODELS, LOCAL.bonsai));
+
+// 2. The embedding models: let transformers.js fetch exactly the files it uses, into models/hf/.
+//    bge-small (34 MB) reads the review's questions; EmbeddingGemma (195 MB) is only used by the older demo.
 env.cacheDir = join(MODELS, LOCAL.hf);
-const extract = await pipeline("feature-extraction", spec.repo, {
-  dtype: spec.dtype as "q4",
-  ...(spec.file ? { model_file_name: spec.file } : {}),
-});
-await extract(["testi"], { pooling: "mean", normalize: true });
-console.log(`✓ upotusmalli: ${join(MODELS, LOCAL.hf, spec.repo)}`);
+for (const name of light ? ["bge-small"] : ["bge-small", DEFAULT_EMBEDDER]) {
+  const spec = EMBEDDERS[name]!;
+  const extract = await pipeline("feature-extraction", spec.repo, {
+    dtype: spec.dtype as "q4",
+    ...(spec.file ? { model_file_name: spec.file } : {}),
+  });
+  await extract(["testi"], { pooling: "mean", normalize: true });
+  console.log(`✓ upotusmalli: ${join(MODELS, LOCAL.hf, spec.repo)}`);
+}
 
 // 3. The ONNX runtime's WebAssembly files, the same version transformers.js was built with.
 const ortDist = join(import.meta.dirname, "..", "node_modules", "onnxruntime-web", "dist");

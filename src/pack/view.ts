@@ -155,6 +155,21 @@ const RULES: [Priority, RegExp][] = [
 ];
 
 /** Free text → the choices the dashboard understands. Deterministic; a model can phrase this later, not decide it. */
+const fold = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ł/g, "l").replace(/ø/g, "o").toLowerCase();
+
+/** The sites a text names, in order of appearance, ignoring accents ("Jyvaskyla" finds Jyväskylä). */
+export function sitesIn<T extends { name: string; city: string }>(text: string, sites: T[]): T[] {
+  const t = fold(text);
+  return sites
+    .map((s) => {
+      const at = [fold(s.city), fold(s.name)].map((k) => t.indexOf(k)).filter((i) => i >= 0);
+      return { s, at: at.length ? Math.min(...at) : -1 };
+    })
+    .filter((x) => x.at >= 0)
+    .sort((a, b) => a.at - b.at)
+    .map((x) => x.s);
+}
+
 export function interpret(text: string, L: PackLedger): Interpretation {
   const t = text.toLowerCase();
   const matched: string[] = [];
@@ -176,7 +191,7 @@ export function interpret(text: string, L: PackLedger): Interpretation {
   const q = /\bq([1-4])\b/i.exec(t);
   const period = q ? `Q${q[1]}` : undefined;
   if (period) matched.push(`period → ${period}`);
-  const site = L.sites.find((s) => t.includes(s.name.toLowerCase()) || t.includes(s.city.toLowerCase()));
+  const site = sitesIn(text, L.sites)[0];
   if (site) matched.push(`site → ${site.name}`);
   return { text, priority, baseline, period, siteId: site?.id, matched };
 }
