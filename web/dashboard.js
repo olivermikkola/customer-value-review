@@ -96,6 +96,7 @@ function renderControls() {
     seg("Period", state.period, m.periods.map((p) => [p.id, p.id === "FY" ? "2025" : p.id]), (v) => { state.period = v; load(); }),
     sel("Compare with", state.baseline, m.baselines.map((b) => [b.id, b.name]), (v) => { state.baseline = v; load(); }),
     seg("Assumptions", state.scenario, m.scenarios.map((s) => [s, s[0].toUpperCase() + s.slice(1)]), (v) => { state.scenario = v; load(); }),
+    el("a", { class: "btn primary", id: "exportBtn", href: `/api/export.pptx?${new URLSearchParams({ customer: state.customer, period: state.period, baseline: state.baseline, scenario: state.scenario, priority: state.priority })}`, download: "", "data-tip": "PowerPoint for this exact view: customer, period, comparison, assumptions and priority" }, "Download review (.pptx)"),
   );
 }
 async function resetToIndustry() {

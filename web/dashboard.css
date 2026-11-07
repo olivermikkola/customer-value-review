@@ -267,3 +267,5 @@ button.inp:hover { background: var(--accent-soft); }
 /* long labels wrap instead of pushing the page wider than the screen */
 .chip { max-width: 100%; white-space: normal; text-align: left; }
 .panel table, .cmp-side table { display: block; overflow-x: auto; }
+
+a.btn { text-decoration: none; display: inline-block; align-self: flex-end; }

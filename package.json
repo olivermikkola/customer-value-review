@@ -29,5 +29,8 @@
     "jsdom": "^25.0.1",
     "playwright-core": "^1.65.0",
     "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
   }
 }
