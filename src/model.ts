@@ -19,11 +19,32 @@ export function worstConfidence(...cs: Confidence[]): Confidence {
   return cs.reduce((a, b) => (CONFIDENCE_RANK[a] >= CONFIDENCE_RANK[b] ? a : b));
 }
 
+/**
+ * What kind of number this is, separate from how much to trust it. Everything
+ * in the hackathon pack is synthetic, so a "measured" confidence alone would
+ * mislead; `status` says what was done to the numbers on the way here.
+ * Ordered: a result carries the highest status of anything it was built from.
+ */
+export type DataStatus = "synthetic" | "calculated" | "allocated" | "estimated";
+export const STATUS_RANK: Record<DataStatus, number> = {
+  synthetic: 0,
+  calculated: 1,
+  allocated: 2,
+  estimated: 3,
+};
+export function worstStatus(...ss: DataStatus[]): DataStatus {
+  return ss.reduce((a, b) => (STATUS_RANK[a] >= STATUS_RANK[b] ? a : b));
+}
+
 export type Period = { from: string; to: string };
 
 export type Scope = {
   customerId: string;
   siteId?: string;
+  laundryId?: string;
+  productId?: string;
+  /** Free-form slice such as a repair type, when the metric needs one. */
+  slice?: string;
   serviceId?: string;
 };
 
@@ -36,7 +57,12 @@ export type SourceKind =
   | "loss"
   | "assignment"
   | "invoice"
-  | "hr";
+  | "hr"
+  | "service_activity"
+  | "repair_record"
+  | "service_cycles"
+  | "laundry_resource"
+  | "waste_record";
 
 /** A raw fact. Immutable: `checksum` is the hash of its canonical content. */
 export interface Source {
@@ -51,6 +77,8 @@ export interface Source {
   ref: string;
   ingestedAt: string;
   checksum: string;
+  /** The pack's own data_status label for the row, verbatim. */
+  dataStatus?: string;
 }
 
 /**
@@ -67,6 +95,8 @@ export interface Factor {
   validTo?: string;
   sourceRef: string;
   kind: Confidence;
+  /** Defaults to "estimated": a factor is an assumption unless said otherwise. */
+  status?: DataStatus;
 }
 
 /**
@@ -89,6 +119,7 @@ export interface Measure {
   /** Factor ids in `id@version` form. Pinned, never floating. */
   factors: string[];
   confidence: Confidence;
+  status?: DataStatus;
 }
 
 /** How a Claim's stated value is derived. Deterministic, no LLM involved. */
