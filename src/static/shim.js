@@ -1,12 +1,15 @@
 /* Lets the dashboard run with no server: /api/* requests are answered by engine.js in this page
    (the same code the server runs, built by scripts/build-static.ts). Loaded before dashboard.js. */
 window.__static = true;
+// A variable, so the single-file bundler leaves this import alone.
+const ENGINE_URL = "./engine.js";
 const realFetch = window.fetch.bind(window);
 
+// Single-file build: the pack and the engine are already in the page (window.__PACK, window.__ENGINE).
 const ready = (async () => {
   const [pack, eng] = await Promise.all([
-    realFetch(new URL("./pack.json", import.meta.url)).then((r) => r.json()),
-    import("./engine.js"),
+    window.__PACK ?? realFetch(new URL("./pack.json", import.meta.url)).then((r) => r.json()),
+    window.__ENGINE ?? import(ENGINE_URL),
   ]);
   eng.init(pack);
   return eng;
