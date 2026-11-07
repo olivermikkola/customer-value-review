@@ -48,7 +48,7 @@ export function buildDeck(v: CustomerView): Promise<Buffer> {
     s.addShape(p.ShapeType.roundRect, { x, y, w, h: 1.5, rectRadius: 0.08, fill: { color: accent ? C.accentSoft : C.white }, line: { color: accent ? C.accent : C.line, width: 1 } });
     s.addText(label, { x: x + 0.15, y: y + 0.1, w: w - 0.3, h: 0.3, fontFace: FONT, fontSize: 11, color: C.ink2 });
     s.addText(cell.display, { x: x + 0.15, y: y + 0.42, w: w - 0.3, h: 0.6, fontFace: FONT, fontSize: 28, bold: true, color: C.ink, fit: "shrink" });
-    s.addText(`${sub ? sub + "  ·  " : ""}${STATUS[cell.status]}`, { x: x + 0.15, y: y + 0.98, w: w - 0.3, h: 0.5, valign: "top", fontFace: FONT, fontSize: 9.5, color: cell.status === "estimated" ? C.warn : C.muted, fit: "shrink" });
+    s.addText([sub, cell.status === "calculated" ? "" : STATUS[cell.status]].filter(Boolean).join("  ·  "), { x: x + 0.15, y: y + 0.98, w: w - 0.3, h: 0.5, valign: "top", fontFace: FONT, fontSize: 9.5, color: cell.status === "estimated" ? C.warn : C.muted, fit: "shrink" });
   };
 
   const priorityLabel = { overview: "Overall value", water: "Water", emissions: "Emissions", cost: "Cost & allocation", circularity: "Circularity", service: "Service performance" }[v.params.priority];
