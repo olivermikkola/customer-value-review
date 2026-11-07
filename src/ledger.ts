@@ -1,6 +1,8 @@
 import { evaluate, variables } from "./expr.ts";
 import {
   worstConfidence,
+  worstStatus,
+  type DataStatus,
   type Confidence,
   type Factor,
   type Measure,
@@ -30,23 +32,26 @@ export function buildIndex(seed: Seed): RefIndex {
   };
 }
 
-function resolveRef(ref: string, idx: RefIndex): { value: number; confidence: Confidence } {
+export function resolveRef(
+  ref: string,
+  idx: RefIndex,
+): { value: number; confidence: Confidence; status: DataStatus } {
   if (ref.startsWith("src:")) {
     const s = idx.sources.get(ref);
     assert(s, `unknown source: ${ref}`);
     // A meter reading is measured. A claim about a picked-up weight is measured
     // too — both are point observations, not model output.
-    return { value: s.value, confidence: "measured" };
+    return { value: s.value, confidence: "measured", status: "synthetic" };
   }
   if (ref.startsWith("mea:")) {
     const m = idx.measures.get(ref);
     assert(m, `unknown measure: ${ref} (must be built before it is referenced)`);
-    return { value: m.value, confidence: m.confidence };
+    return { value: m.value, confidence: m.confidence, status: m.status ?? "calculated" };
   }
   if (ref.startsWith("fac:")) {
     const f = idx.factors.get(ref);
     assert(f, `unknown factor: ${ref} — factors must be referenced as id@version`);
-    return { value: f.value, confidence: f.kind };
+    return { value: f.value, confidence: f.kind, status: f.status ?? "estimated" };
   }
   throw new Error(`unresolvable ref: ${ref}`);
 }
@@ -83,9 +88,11 @@ interface MeasureSpec {
   formula: string;
   bindings: Record<string, string>;
   confidence: Confidence;
+  /** Floor for the measure's status; inputs can only raise it. */
+  status?: DataStatus;
 }
 
-function addMeasure(idx: RefIndex, spec: MeasureSpec): Measure {
+export function addMeasure(idx: RefIndex, spec: MeasureSpec): Measure {
   const factors = Object.values(spec.bindings).filter((r) => r.startsWith("fac:"));
   const inputs = Object.values(spec.bindings).filter((r) => !r.startsWith("fac:"));
 
@@ -107,6 +114,10 @@ function addMeasure(idx: RefIndex, spec: MeasureSpec): Measure {
     inputs,
     factors,
     confidence: provenanceConfidence,
+    status: worstStatus(
+      spec.status ?? "calculated",
+      ...Object.values(spec.bindings).map((r) => resolveRef(r, idx).status),
+    ),
   };
   m.value = evaluate(spec.formula, envOf(m, idx));
   idx.measures.set(m.id, m);
