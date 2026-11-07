@@ -5,7 +5,8 @@ import { measureRecomputes } from "../ledger.ts";
 import type { Measure } from "../model.ts";
 import { BASELINE_IDS, buildPackLedger, SCENARIOS, YEAR, type BaselineId, type PackLedger, type Scenario } from "./build.ts";
 import { PACK_FILE } from "./file.ts";
-import { gateText, routeQuestion, tasksFor, toPublic, summaryTask, observationTask, type Task } from "./narrate.ts";
+import { gateText, routeQuestion, tasksFor, toPublic, noteTask, observationTask, type Task } from "./narrate.ts";
+import { answerQuestion, intentTexts, THRESHOLDS } from "./answer.ts";
 import { buildDeck } from "./deck.ts";
 import { readPack, str, type Pack } from "./read.ts";
 import { buildView, DEFAULT_PARAMS, fmt, interpret, PRIORITIES, PRIORITY_INFO, type Params, type Priority } from "./view.ts";
@@ -16,7 +17,11 @@ export interface Loaded {
 }
 
 export async function loadAll(file = PACK_FILE): Promise<Loaded> {
-  const pack = await readPack(file);
+  return loadFromPack(await readPack(file));
+}
+
+/** Builds and checks every customer's ledger from an already-read pack (also what the static site does in the browser). */
+export function loadFromPack(pack: Pack): Loaded {
   const ledgers = new Map<string, PackLedger>();
   for (const c of pack.customers) {
     const L = buildPackLedger(pack, str(c, "customer_id"));
@@ -157,7 +162,7 @@ function rebuild(d: Loaded, customer: string, q: URLSearchParams, taskId: string
     return "task" in routed ? { task: routed.task, view: v } : null;
   }
   const v = view(d, customer, q)!;
-  if (taskId === "summary") return { task: summaryTask(v), view: v };
+  if (taskId === "summary") return { task: noteTask(v), view: v };
   const o = v.observations.find((x) => x.id === taskId);
   return o ? { task: observationTask(v, o), view: v } : null;
 }
@@ -168,4 +173,24 @@ export function gate(d: Loaded, body: { customer?: string; params?: Record<strin
   if (!r) return null;
   const keep = Array.isArray(body.keep) ? body.keep.map(String) : [];
   return gateText(r.task, r.view, String(body.raw ?? ""), keep);
+}
+
+// ------------------------------------------------------------------ answers without a model
+
+/** What the browser's embedding model compares questions against. */
+export function intents() {
+  return { intents: intentTexts(), thresholds: THRESHOLDS };
+}
+
+/** A free-text question, answered from the figures by rules. `sims` is the embedding model's best similarity per intent (optional). */
+export function reply(d: Loaded, customer: string, text: string, q: URLSearchParams, sims?: Record<string, number>, force?: string) {
+  const L = d.ledgers.get(customer);
+  if (!L) return null;
+  const interp = interpret(text, L);
+  const params = new URLSearchParams(q);
+  if (interp.priority !== "overview") params.set("priority", interp.priority);
+  if (interp.baseline) params.set("baseline", interp.baseline);
+  if (interp.period) params.set("period", interp.period);
+  const v = view(d, customer, params)!;
+  return { interpretation: interp, params: Object.fromEntries(params), answer: answerQuestion(v, text, interp, sims, force) };
 }

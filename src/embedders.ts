@@ -18,6 +18,20 @@ export interface EmbedderSpec {
 }
 
 export const EMBEDDERS: Record<string, EmbedderSpec> = {
+  "minilm": {
+    repo: "Xenova/all-MiniLM-L6-v2",
+    dtype: "q8",
+    mb: 23,
+    query: "",
+    doc: "",
+  },
+  "bge-small": {
+    repo: "Xenova/bge-small-en-v1.5",
+    dtype: "q8",
+    mb: 34,
+    query: "Represent this sentence for searching relevant passages: ",
+    doc: "",
+  },
   "e5-small": {
     repo: "Xenova/multilingual-e5-small",
     dtype: "q8",

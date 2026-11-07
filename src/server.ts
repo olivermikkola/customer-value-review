@@ -9,9 +9,23 @@ import { TOPICS } from "./topics.ts";
 import { DEFAULT_EMBEDDER, EMBEDDERS } from "./embedders.ts";
 import type { Lens } from "./review.ts";
 import { LOCAL, MODELS } from "./local.ts";
-import { answer as packAnswer, gate as packGate, narrate as packNarrate, deck as packDeck, ask as packAsk, loadAll, meta as packMeta, trace as packTrace, view as packView } from "./pack/api.ts";
+import { answer as packAnswer, reply as packReply, intents as packIntents, gate as packGate, narrate as packNarrate, deck as packDeck, ask as packAsk, loadAll, meta as packMeta, trace as packTrace, view as packView } from "./pack/api.ts";
 
 const pack = await loadAll();
+
+/** Similarities from the browser's embedding model: numbers only, anything else is dropped. */
+function parseSims(raw: string | null): Record<string, number> | undefined {
+  try {
+    const o = JSON.parse(raw ?? "null") as Record<string, unknown> | null;
+    if (!o || typeof o !== "object") return undefined;
+    return Object.fromEntries(Object.entries(o).filter((e): e is [string, number] => typeof e[1] === "number" && Number.isFinite(e[1])));
+  } catch {
+    return undefined;
+  }
+}
+
+/** The embedding model that reads questions. bge-small: 34 MB, CPU only; see scripts/answer-eval.ts for the comparison. */
+const ANSWER_EMBEDDER = process.env.LANKA_EMBEDDER && EMBEDDERS[process.env.LANKA_EMBEDDER] ? process.env.LANKA_EMBEDDER : "bge-small";
 
 const WEB = join(import.meta.dirname, "..", "web");
 
@@ -92,6 +106,20 @@ const server = createServer((req, res) => {
     return;
   }
 
+  // The small meaning model and the phrasings it compares questions with; local files when `npm run models` has fetched them.
+  if (url.pathname === "/api/intents") {
+    const has = (rel: string) => existsSync(join(MODELS, rel));
+    const spec = EMBEDDERS[ANSWER_EMBEDDER]!;
+    res.writeHead(200, { "content-type": MIME[".json"]!, "cache-control": "no-store" });
+    res.end(JSON.stringify({
+      embedderId: ANSWER_EMBEDDER, embedder: spec,
+      hf: has(join(LOCAL.hf, spec.repo, "config.json")) ? `/models/${LOCAL.hf}/` : null,
+      ort: has(join(LOCAL.ort, "ort-wasm-simd-threaded.jsep.wasm")) ? `/models/${LOCAL.ort}/` : null,
+      ...packIntents(),
+    }));
+    return;
+  }
+
   if (url.pathname.startsWith("/api/")) {
     const json = (code: number, body: unknown) => {
       res.writeHead(code, { "content-type": MIME[".json"]!, "cache-control": "no-store" });
@@ -103,6 +131,7 @@ const server = createServer((req, res) => {
       : url.pathname === "/api/view" ? packView(pack, customer, url.searchParams)
       : url.pathname === "/api/ask" ? packAsk(pack, customer, (url.searchParams.get("q") ?? "").slice(0, 300))
       : url.pathname === "/api/narrate" ? packNarrate(pack, customer, url.searchParams)
+      : url.pathname === "/api/reply" ? packReply(pack, customer, (url.searchParams.get("q") ?? "").slice(0, 300), url.searchParams, parseSims(url.searchParams.get("sims")), url.searchParams.get("force") ?? undefined)
       : url.pathname === "/api/answer" ? packAnswer(pack, customer, (url.searchParams.get("q") ?? "").slice(0, 300), url.searchParams)
       : url.pathname === "/api/trace" ? packTrace(pack, customer, url.searchParams.get("measure") ?? "")
       : undefined;

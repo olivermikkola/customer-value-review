@@ -69,7 +69,8 @@ function factsOf(items: { label: string; cell: Cell; note?: string }[]): Fact[] 
 
 function siteNamesIn(view: CustomerView, facts: Fact[], context: string): string[] {
   const text = `${facts.map((f) => f.label).join(" ")} ${context}`;
-  return view.sites.filter((s) => text.includes(s.name)).map((s) => s.name);
+  // A site named by its city ("Västerås") in the rules text is as much "given" as its full name.
+  return view.sites.filter((s) => text.includes(s.name) || text.includes(s.city)).map((s) => s.name);
 }
 
 function build(view: CustomerView, base: Omit<Task, "system" | "user" | "siteNames" | "context"> & { instruction: string; question?: string; context?: string }): Task {
@@ -99,6 +100,43 @@ export function summaryTask(view: CustomerView): Task {
   });
 }
 
+/**
+ * The note that opens the meeting. Rules pick the findings (one that went well, one that needs
+ * attention, and its proposed action); the model's job is to turn them into a short message for this
+ * customer's decision-maker. That is the part rules write badly, and the gate still owns every figure.
+ */
+const PRIORITY_WORDS: Record<string, string | undefined> = { water: "water use", emissions: "emissions", cost: "cost and allocation", circularity: "repair and circularity", service: "service reliability" };
+
+export function noteTask(view: CustomerView): Task {
+  const obs = view.observations;
+  const good = obs.find((o) => o.tone === "good") ?? obs[0];
+  if (!good) return summaryTask(view);
+  const attention = obs.find((o) => o !== good && o.tone !== "good") ?? obs.find((o) => o !== good);
+  const picked = [good, attention].filter(Boolean) as Observation[];
+  const facts = factsOf(picked.flatMap((o) => o.evidence.slice(0, 2)));
+  const priority = PRIORITY_WORDS[view.params.priority];
+  const lines = [
+    `Went well: ${good.headline}`,
+    ...(attention ? [`Needs attention: ${attention.headline}`, `Question for the meeting: ${attention.discuss}`, `Proposed next step: ${attention.action.title}`] : []),
+  ];
+  return build(view, {
+    context: picked.map((o) => `${o.headline} ${o.discuss} ${o.action.title}`).join(" "),
+    id: "summary",
+    kind: "summary",
+    title: `A note to open the meeting with ${view.customer.name}`,
+    maxSentences: 3,
+    facts,
+    fallbacks: picked.map((o) => o.headline.replace(/\.?$/, ".")),
+    instruction: [
+      ...lines,
+      "",
+      `Write a short note, three sentences, that the account manager can read out to open the yearly review with ${view.customer.name}${priority ? `, whose top concern is ${priority}` : ""}.`,
+      "Sentence 1: what went well, with one figure. Sentence 2: what needs attention, with one figure. Sentence 3: what we propose to agree in the meeting, with no figure.",
+      "Address the customer as 'you' and the service provider as 'we'. Warm and direct, like a person talking, not a report.",
+    ].join("\n"),
+  });
+}
+
 export function observationTask(view: CustomerView, o: Observation): Task {
   const facts = factsOf(o.evidence);
   return build(view, {
@@ -114,7 +152,7 @@ export function observationTask(view: CustomerView, o: Observation): Task {
 }
 
 export function tasksFor(view: CustomerView, max = 4): Task[] {
-  return [summaryTask(view), ...view.observations.slice(0, max).map((o) => observationTask(view, o))];
+  return [noteTask(view), ...view.observations.slice(0, max).map((o) => observationTask(view, o))];
 }
 
 export function toPublic(t: Task): PublicTask {
@@ -142,15 +180,15 @@ const SITE_METRIC_LABEL: Record<string, string> = {
   rep_per_100: "repairs per 100 wearers", excess_pieces: "garments above average need", unused_cost: "capital in unscanned garments",
 };
 
-const NO_DATA: { re: RegExp; reason: string; module?: Module }[] = [
-  { re: /\b(why|what caused|what is causing|reason for|root cause)\b/i, reason: "The data records what happened, not why. This review cannot give causes; the observations list questions to ask instead." },
-  { re: /\b(did|have|has)\b.{0,30}\b(go (up|down)|fall|fell|drop(ped)?|rise|rose|increase[d]?|decrease[d]?|improve[d]?|fix(ed)?|chang(e|ed)|better|worse)\b|\b(last year|previous year|year[- ]on[- ]year|since last|over time|trend)\b/i, reason: "This review covers 2025 only, so it cannot say whether something improved, changed or was fixed. The quarterly charts show the course through the year." },
-  { re: /\b(price|prices|invoice|invoices|billing|bill|quote|contract|pay|paying|payment|payments|paid)\b/i, reason: "This review has no prices, invoices or contract data, so it cannot answer that." },
-  { re: /\b(benchmark|benchmarks|other customers|peers|industry average|compared (to|with) (other|similar)|better than (others|average))\b/i, reason: "There is no data on other customers in this review, so no comparison with them is possible.", module: MODULES.benchmarking },
-  { re: /\b(forecast|predict|prediction|projection|will we|going to be|expected next)\w*/i, reason: "This review looks back at the period; it contains no forecasts.", module: MODULES.predictive },
-  { re: /\b(esg|csrd|audit|audited|certif\w*|traceab\w*|origin of|recycled material)\b/i, reason: "This prototype is not audit-ready and holds no material traceability data.", module: MODULES.compliance },
-  { re: /\b(order|orders|ordering|tracking|track my|where is|shipment|delivery status)\b/i, reason: "Orders and live delivery status are not part of this review.", module: MODULES.transparency },
-  { re: /\b(contact|phone|email|logo|complaint|complaints|quality of|account manager)\b/i, reason: "That is not something the data in this review covers." },
+export const NO_DATA: { id: string; re: RegExp; reason: string; module?: Module }[] = [
+  { id: "why", re: /\b(why|what caused|what is causing|reason for|root cause)\b/i, reason: "The data records what happened, not why. This review cannot give causes; the observations list questions to ask instead." },
+  { id: "change", re: /\b(did|have|has)\b.{0,30}\b(go (up|down)|fall|fell|drop(ped)?|rise|rose|increase[d]?|decrease[d]?|improve[d]?|fix(ed)?|chang(e|ed)|better|worse)\b|\b(last year|previous year|year[- ]on[- ]year|since last|over time|trend)\b/i, reason: "This review covers 2025 only, so it cannot say whether something improved, changed or was fixed. The quarterly charts show the course through the year." },
+  { id: "price", re: /\b(price|prices|invoice|invoices|billing|bill|quote|contract|pay|paying|payment|payments|paid)\b/i, reason: "This review has no prices, invoices or contract data, so it cannot answer that." },
+  { id: "benchmark", re: /\b(benchmark|benchmarks|other customers|peers|industry average|compared (to|with) (other|similar)|better than (others|average))\b/i, reason: "There is no data on other customers in this review, so no comparison with them is possible.", module: MODULES.benchmarking },
+  { id: "forecast", re: /\b(forecast|predict|prediction|projection|will we|going to be|expected next)\w*/i, reason: "This review looks back at the period; it contains no forecasts.", module: MODULES.predictive },
+  { id: "compliance", re: /\b(esg|csrd|audit|audited|certif\w*|traceab\w*|origin of|recycled material)\b/i, reason: "This prototype is not audit-ready and holds no material traceability data.", module: MODULES.compliance },
+  { id: "orders", re: /\b(order|orders|ordering|tracking|track my|where is|shipment|delivery status)\b/i, reason: "Orders and live delivery status are not part of this review.", module: MODULES.transparency },
+  { id: "other", re: /\b(contact|phone|email|logo|complaint|complaints|quality of|account manager)\b/i, reason: "That is not something the data in this review covers." },
 ];
 
 export type Routed = { noData: { reason: string; module?: Module } } | { task: Task };

@@ -290,3 +290,19 @@ a.btn { text-decoration: none; display: inline-block; align-self: flex-end; }
 .module-tag { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 8px; }
 .module-card p { margin-top: 4px; font-size: 13.5px; color: var(--ink-2); }
 .ai-detail { color: var(--ink); }
+
+/* ---------- ask this review ---------- */
+.qa { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+.qa-answer { display: flex; flex-direction: column; gap: 12px; }
+.qa-head { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; justify-content: space-between; }
+.conf { font-size: 12px; border: 1px solid var(--line-2); border-radius: 999px; padding: 2px 10px; color: var(--ink-3); background: var(--surface-2); }
+.conf.high { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.qa-sent { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.qa-sent li { font-size: 15px; }
+.qa-sent li.question::before { content: "?"; display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 700; margin-right: 8px; }
+.qa-sent li.note { color: var(--ink-2); }
+.qa-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.qa-more { display: flex; flex-direction: column; gap: 6px; }
+.qa-read, .qa-model { font-size: 12.5px; }
+.qa-answer.no-data .qa-head h3 { color: var(--ink-2); }
+.proofs { font-size: 12.5px; }
