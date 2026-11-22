@@ -1,6 +1,6 @@
 # Customer Value Review
 
-**Every number in a Lindström customer review opens its proof, and the customer-ready deck is one click away.**
+**Trace the figures in a synthetic customer review to their source and export a PowerPoint in one click.**
 
 Since AI Hackathon 2026, Lindström challenge: *Customer Value & Sustainability Review Generator*.
 
@@ -30,7 +30,7 @@ Every customer asks Lindström one question: *what value did you actually create
 <td><img src="docs/img/ainote-crop.jpg" alt="On-device AI meeting note"><br><sub>The meeting note, drafted by a model running in the browser. Every figure links to its proof.</sub></td>
 </tr></table>
 
-## On-device AI that cannot invent a figure
+## On-device meeting notes with a rule-based checker
 
 A small language model (Ternary Bonsai 2, 4B, WebGPU) runs **in the browser on the account manager's own computer** and drafts the three-sentence note that opens the meeting. Customer data never leaves the device.
 
@@ -41,6 +41,8 @@ rules pick the findings and supply every figure
      a causal claim, an overclaim, a site outside the facts
    → page: every figure links to its evidence; after two failures the rules-written sentence is shown, marked "Rules"
 ```
+
+The checker tests allowed figure and unit tokens, estimation language, and selected unsupported phrases. It checks defined rules, so read the note against its linked evidence before sharing it.
 
 Measured with `scripts/review-ai-eval.mjs` (3 customers × 3 priorities, Radeon 890M, ~23 tokens/s): **96 of 98** model-written sentences passed. The two it stopped had used an estimate without saying so.
 
@@ -82,3 +84,7 @@ Status labels: **Synthetic** (summed from the pack), **Calculated** (ratios of t
 ## Credits
 
 Ternary Bonsai 2 by PrismML and its WebGPU engine (Apache-2.0, see `web/vendor/BONSAI-*`); Transformers.js by Hugging Face (Apache-2.0); PptxGenJS; ExcelJS. Demo narration voiced with ElevenLabs.
+
+## Reuse
+
+The demo uses the synthetic hackathon data pack. The repository currently has no project-wide license. Third-party assets and libraries retain their own terms.
