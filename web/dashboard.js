@@ -406,7 +406,7 @@ function method(v) {
     el("div", { class: "card panel" }, el("h3", {}, "How to read a number"), el("div", { class: "legend-status" }, Object.keys(STATUS).map((s) => el("span", {}, badge(s), " ", STATUS_HELP[s])))),
     el("div", { class: "card gaps" }, v.gaps.map((g) => el("div", { class: "gap" }, el("span", { class: `sev ${g.severity}` }, g.severity), el("span", {}, g.text)))),
     el("div", { class: "card panel" }, el("h3", {}, "Assumptions"),
-      el("table", {}, el("thead", {}, el("tr", {}, el("th", {}, "ID"), el("th", {}, "Assumption"), el("th", {}, "Rule"), el("th", {}, "Confidence"))),
+      el("table", { tabindex: "0", "aria-label": "Review assumptions" }, el("thead", {}, el("tr", {}, el("th", {}, "ID"), el("th", {}, "Assumption"), el("th", {}, "Rule"), el("th", {}, "Confidence"))),
         el("tbody", {}, m.assumptions.map((a) => el("tr", {}, el("td", {}, a.id), el("td", {}, a.name), el("td", {}, a.rule), el("td", {}, a.confidence)))))),
     el("p", { class: "muted" }, "Not an audited sustainability report. All figures are synthetic or estimated and must not be presented as real Lindström or customer performance."),
   );

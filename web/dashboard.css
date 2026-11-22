@@ -5,10 +5,10 @@
   --surface-2: #f8f9fb;
   --ink: #101828;
   --ink-2: #475467;
-  --ink-3: #6b7686;
+  --ink-3: #525e70;
   --line: #e4e7ec;
   --line-2: #d0d5dd;
-  --accent: #2a78d6;
+  --accent: #1657a7;
   --accent-soft: #e8f0fb;
   --alt: #eb6834;
   --alt-soft: #fdeee7;
@@ -25,7 +25,7 @@
   :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
     --bg: #0d1117; --surface: #151b23; --surface-2: #1a212b; --ink: #eef1f5; --ink-2: #b4bdca; --ink-3: #8b97a7;
-    --line: #262e3a; --line-2: #36404e; --accent: #3987e5; --accent-soft: #14283f; --alt: #d95926; --alt-soft: #3a2018;
+    --line: #262e3a; --line-2: #36404e; --accent: #7eb9fb; --accent-soft: #14283f; --alt: #d95926; --alt-soft: #3a2018;
     --good: #4cc38a; --good-soft: #10281d; --warn: #e5b04a; --warn-soft: #2e2410; --act: #f08178; --act-soft: #34191a;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px -12px rgba(0, 0, 0, 0.6);
   }
@@ -33,7 +33,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --bg: #0d1117; --surface: #151b23; --surface-2: #1a212b; --ink: #eef1f5; --ink-2: #b4bdca; --ink-3: #8b97a7;
-  --line: #262e3a; --line-2: #36404e; --accent: #3987e5; --accent-soft: #14283f; --alt: #d95926; --alt-soft: #3a2018;
+  --line: #262e3a; --line-2: #36404e; --accent: #7eb9fb; --accent-soft: #14283f; --alt: #d95926; --alt-soft: #3a2018;
   --good: #4cc38a; --good-soft: #10281d; --warn: #e5b04a; --warn-soft: #2e2410; --act: #f08178; --act-soft: #34191a;
 }
 
@@ -306,3 +306,5 @@ a.btn { text-decoration: none; display: inline-block; align-self: flex-end; }
 .qa-read, .qa-model { font-size: 12.5px; }
 .qa-answer.no-data .qa-head h3 { color: var(--ink-2); }
 .proofs { font-size: 12.5px; }
+
+[data-theme="dark"] .btn.primary, [data-theme="dark"] .why li.on .rk { color: #101828; }
